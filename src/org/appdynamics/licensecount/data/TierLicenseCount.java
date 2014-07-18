@@ -153,7 +153,7 @@ public class TierLicenseCount extends LicenseCount{
     
     
     //0:Java, 1:IIS, 2:PHP, 3:NodeJS, 4 Machine Agent
-    public void countNodeLicenses(ArrayList<TimeRange> timeRanges){
+    public void countNodeLicenses(ArrayList<TimeRange> timeRanges,HashMap<String,ArrayList<Node>> dotNetMap){
         
         if(s.debugLevel >= 2) 
             logger.log(Level.INFO,new StringBuilder().append("Starting tier level license count ").toString());
@@ -162,21 +162,6 @@ public class TierLicenseCount extends LicenseCount{
             nodeL.countNodeLicenseRange(s.percentageThreshold);  
         }
         
-        HashMap<String,ArrayList<Node>> dotNetMap=new HashMap<String,ArrayList<Node>>();
-
-        
-        //logger.log(Level.INFO,"Starting to get the types of agents for DotNet and PHP");
- 
-        for(NodeLicenseCount nCount: getNodeLicenseCount()){
-            if(nCount.getType() == 1 ){
-                if(nCount.getType() == 1){
-                    if(!dotNetMap.containsKey(nCount.getNode().getMachineName())) dotNetMap.put(nCount.getNode().getMachineName(), new ArrayList<Node>());
-                    //logger.log(Level.INFO, new StringBuilder().append("Add DotNet Node ").append(nCount.getNode().getName()).append(" - ").append(nCount.getNode().getMachineName()).toString());
-                    dotNetMap.get(nCount.getNode().getMachineName()).add(nCount.getNode());
-                }
-
-            }
-        }
         
         
         //logger.log(Level.INFO,"Start to get the license weights for the nodes");

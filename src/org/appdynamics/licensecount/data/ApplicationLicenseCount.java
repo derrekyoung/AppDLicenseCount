@@ -31,7 +31,7 @@ public class ApplicationLicenseCount extends LicenseCount{
     private ArrayList<ApplicationLicenseRange> appLicenseRange= new ArrayList<ApplicationLicenseRange>();
     private ArrayList<AppHourLicenseRange> appHourLicenseRange=new ArrayList<AppHourLicenseRange>();
     private ApplicationLicenseRange totalRangeValue;
-    
+    private HashMap<String,ArrayList<Node>> dotNetMap=new HashMap<String,ArrayList<Node>>();
     
     
 
@@ -85,6 +85,8 @@ public class ApplicationLicenseCount extends LicenseCount{
             }
         }
         
+
+        
         /*
          * Now that we have all of the nodes we are going to get all of the tiers to count
          * the nodes. 
@@ -99,13 +101,16 @@ public class ApplicationLicenseCount extends LicenseCount{
         if(s.debugLevel >= 2) 
             logger.log(Level.INFO,new StringBuilder().append("Begin application level tier license count.").toString());
 
-        
+        /*
+         * We have host with .Net agents that exist in multiple agents, we are going to get a map of all first.
+         */
+        populateDotNetMap();        
         /*
          * This is where we are going identify the countable agents
          */
         //logger.log(Level.INFO,"Starting the nodeLicense count.");
         for(TierLicenseCount tCount: tierLicenses.values()){
-            tCount.countNodeLicenses(timeRanges);
+            tCount.countNodeLicenses(timeRanges,dotNetMap);
         }
         
         for(int i=0; i < timeRanges.size(); i++){
@@ -212,6 +217,34 @@ public class ApplicationLicenseCount extends LicenseCount{
         this.totalRangeValue = totalRangeValue;
     }
 
+    public void populateDotNetMap(){
+        HashMap<String,ArrayList<Node>> dotNetMap=new HashMap<String,ArrayList<Node>>();
+        
+        for(TierLicenseCount tier: tierLicenses.values()){
+            for(NodeLicenseCount nCount: tier.getNodeLicenseCount()){
+                if(nCount.getType() == 1 ){
+                    if(nCount.getType() == 1){
+                        if(!dotNetMap.containsKey(nCount.getNode().getMachineName())) 
+                            dotNetMap.put(nCount.getNode().getMachineName(), new ArrayList<Node>());
+                        
+                        //logger.log(Level.INFO, new StringBuilder().append("Add DotNet Node ").append(nCount.getNode().getName()).append(" - ").append(nCount.getNode().getMachineName()).toString());
+                        dotNetMap.get(nCount.getNode().getMachineName()).add(nCount.getNode());
+                    }
+
+                }
+            }
+        }
+        
+    }
+
+    public HashMap<String, ArrayList<Node>> getDotNetMap() {
+        return dotNetMap;
+    }
+
+    public void setDotNetMap(HashMap<String, ArrayList<Node>> dotNetMap) {
+        this.dotNetMap = dotNetMap;
+    }
+    
     
 
     @Override
