@@ -11,7 +11,8 @@ import org.appdynamics.appdrestapi.util.TimeRange;
  * @author soloink
  */
 public class TierLicenseRange extends TimeRange{
-    protected double javaCount, phpCount, iisCount, nodeJSCount, machineCount, totalCount, tierAppAgentCount, tierMachineAgentCount;
+    protected double javaCount, phpCount, iisCount, iisInternalCount, nodeJSCount, machineCount, 
+            totalCount, tierAppAgentCount, tierMachineAgentCount;
 
     public TierLicenseRange(){super();}
 
@@ -81,7 +82,11 @@ public class TierLicenseRange extends TimeRange{
         this.tierMachineAgentCount = tierMachineAgentCount;
     }
     
-    
+    public String getDotNetCount(){
+        StringBuilder bud = new StringBuilder();
+        bud.append(new Double(iisCount).intValue()).append(" (").append(new Double(iisInternalCount).intValue()).append(")");
+        return bud.toString();
+    }
     
     @Override
     public String toString(){

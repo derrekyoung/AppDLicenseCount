@@ -26,10 +26,12 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 
 /**
  *
@@ -39,6 +41,7 @@ public class WriteExcelDoc {
     private static Logger logger=Logger.getLogger(WriteExcelDoc.class.getName());
     private CustomerLicenseCount customer;
     private String licensePath;
+    private XSSFCellStyle style;
     
     public WriteExcelDoc(){}
     
@@ -52,6 +55,8 @@ public class WriteExcelDoc {
         XSSFSheet licenseTiers = workbook.createSheet(LicenseS.TIER_SUMMARY);
         XSSFSheet licenseHourlyTiers = workbook.createSheet(LicenseS.HOURLY_TIER_SUMMARY);
         XSSFSheet licenseNodeInfo = workbook.createSheet(LicenseS.NODE_INFO_SUMMARY);
+        style = workbook.createCellStyle();
+        style.setAlignment(HorizontalAlignment.RIGHT);
         addNodeInfo(licenseNodeInfo);
         // Lets create the first row which will be the header.
         int headerRowIndex=0;
@@ -212,7 +217,9 @@ public class WriteExcelDoc {
 
                     case 2: //DotNet Agent
                         cell = rows.get(i).createCell(columnCount);
-                        cell.setCellValue(cRange.getIisCount());
+                        //cell.setCellValue(cRange.getIisCount());
+                        cell.setCellValue(cRange.getDotNetCount());
+                        cell.setCellStyle(style);
                         break;
 
                     case 3: //PHP Agent
@@ -309,7 +316,9 @@ public class WriteExcelDoc {
                     case 2: //DotNet Agent
                         cell = rows.get(i).createCell(columnCount);
                         //logger.log(Level.INFO,new StringBuilder().append("Adding .Net ").append(cRange.getIisCount()).toString());
-                        cell.setCellValue(new Double(cRange.getIisCount()));
+                        //cell.setCellValue(new Double(cRange.getIisCount()));
+                        cell.setCellValue(cRange.getDotNetCount());
+                        cell.setCellStyle(style);
       
                         break;
 
@@ -414,7 +423,8 @@ public class WriteExcelDoc {
                     case 2: //DotNet Agent
                         cell = rows.get(i).createCell(columnCount);
                         //logger.log(Level.INFO,new StringBuilder().append("Adding .Net ").append(cRange.getIisCount()).toString());
-                        cell.setCellValue(new Double(cRange.getIisCount()));
+                        //cell.setCellValue(new Double(cRange.getIisCount()));
+                        cell.setCellValue(cRange.getDotNetCount());
       
                         break;
 

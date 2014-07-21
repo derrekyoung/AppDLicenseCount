@@ -93,6 +93,7 @@ public class CustomerLicenseCount extends LicenseCount{
                 aRange.machineCount+=tRange.getMachineCount();
                 aRange.phpCount+=tRange.getPhpCount();
                 aRange.totalCount+=tRange.getTotalCount();
+                aRange.iisInternalCount+=tRange.iisInternalCount;
                 
             }
             //logger.log(Level.INFO, "Value of iisCount " + aRange.iisCount);
@@ -109,6 +110,7 @@ public class CustomerLicenseCount extends LicenseCount{
             totalRangeValue.nodeJSCount+=tRange.nodeJSCount;
             totalRangeValue.machineCount+=tRange.machineCount;
             totalRangeValue.totalCount+=tRange.totalCount;
+            totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
         }
         
         

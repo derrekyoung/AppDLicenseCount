@@ -164,7 +164,7 @@ public class TierLicenseCount extends LicenseCount{
         
         
         
-        //logger.log(Level.INFO,"Start to get the license weights for the nodes");
+        logger.log(Level.INFO,"Start to get the license weights for the nodes " + dotNetMap.keySet().size());
         // This is now going to get the counts for the .Net and php agents.
         for(String key: dotNetMap.keySet()){
             double size = dotNetMap.get(key).size();
@@ -199,10 +199,11 @@ public class TierLicenseCount extends LicenseCount{
                             //StringBuilder bud = new StringBuilder();
                             //bud.append("Adding .Net to ").append(node.getNode().getTierName()).append(" orig value ").append(tRange.iisCount);
                             if(dotNetMapTemp.containsKey(node.getMachineName())){
-                                tRange.iisCount+=1;
-                                tRange.totalCount+=1;
+                                tRange.iisCount++;
+                                tRange.totalCount++;
                                 dotNetMapTemp.remove(node.getMachineName());
                             }
+                            tRange.iisInternalCount++;
                             //tRange.iisCount+=node.getLicWeight();
                             //tRange.totalCount+=node.getLicWeight();
                             break;
@@ -239,6 +240,7 @@ public class TierLicenseCount extends LicenseCount{
             totalRangeValue.nodeJSCount+=tRange.nodeJSCount;
             totalRangeValue.machineCount+=tRange.machineCount;
             totalRangeValue.totalCount+=tRange.totalCount;
+            totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
         }
     }
     
@@ -266,7 +268,6 @@ public class TierLicenseCount extends LicenseCount{
     public void setTierHourLicenseRange(ArrayList<TierHourLicenseRange> tierHourLicenseRange) {
         this.tierHourLicenseRange = tierHourLicenseRange;
     }
-    
     
 
     @Override

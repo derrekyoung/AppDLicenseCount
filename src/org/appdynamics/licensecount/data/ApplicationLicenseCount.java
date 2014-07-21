@@ -127,6 +127,7 @@ public class ApplicationLicenseCount extends LicenseCount{
                 aRange.machineCount+=tRange.getMachineCount();
                 aRange.phpCount+=tRange.getPhpCount();
                 aRange.totalCount+=tRange.getTotalCount();
+                aRange.iisInternalCount+=tRange.iisInternalCount;
                 
             }
             
@@ -156,6 +157,7 @@ public class ApplicationLicenseCount extends LicenseCount{
             totalRangeValue.nodeJSCount+=tRange.nodeJSCount;
             totalRangeValue.machineCount+=tRange.machineCount;
             totalRangeValue.totalCount+=tRange.totalCount;
+            totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
         }
         
     }
@@ -218,8 +220,7 @@ public class ApplicationLicenseCount extends LicenseCount{
     }
 
     public void populateDotNetMap(){
-        HashMap<String,ArrayList<Node>> dotNetMap=new HashMap<String,ArrayList<Node>>();
-        
+        dotNetMap=new HashMap<String,ArrayList<Node>>();
         for(TierLicenseCount tier: tierLicenses.values()){
             for(NodeLicenseCount nCount: tier.getNodeLicenseCount()){
                 if(nCount.getType() == 1 ){
