@@ -425,7 +425,7 @@ public class WriteExcelDoc {
                         //logger.log(Level.INFO,new StringBuilder().append("Adding .Net ").append(cRange.getIisCount()).toString());
                         //cell.setCellValue(new Double(cRange.getIisCount()));
                         cell.setCellValue(cRange.getDotNetCount());
-      
+                        cell.setCellStyle(style);
                         break;
 
                     case 3: //PHP Agent
