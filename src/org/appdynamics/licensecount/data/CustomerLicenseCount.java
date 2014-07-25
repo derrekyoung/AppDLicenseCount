@@ -5,12 +5,12 @@
 package org.appdynamics.licensecount.data;
 
 import org.appdynamics.appdrestapi.RESTAccess;
+import org.appdynamics.appdrestapi.resources.s;
+import org.appdynamics.licensecount.actions.ThreadExecutor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import org.appdynamics.appdrestapi.data.*;
-import org.appdynamics.appdrestapi.resources.s;
+
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -60,10 +60,13 @@ public class CustomerLicenseCount extends LicenseCount{
         totalRangeValue.setStart(totalRange.getStart());
         totalRangeValue.setEnd(totalRange.getEnd());
         
+        
         for(ApplicationLicenseCount app: applications.values()){
             logger.log(Level.INFO,new StringBuilder().append("\tPopulating application ").append(app.getApplicationName()).toString());
             app.populateLicense(access.getNodesForApplication(app.getApplicationId()), access, timeRanges,totalRange);
         }
+        
+ 
         /*
         
         */

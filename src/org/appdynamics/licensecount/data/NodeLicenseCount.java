@@ -51,6 +51,7 @@ public class NodeLicenseCount extends LicenseCount{
     }
     
     public void setInformation(){
+        totalRangeValue=new NodeLicenseRange("Total Node Count");
 
         if(node.isMachineAgentPresent() && !node.isAppAgentPresent()){
             type=4;
@@ -119,10 +120,11 @@ public class NodeLicenseCount extends LicenseCount{
     
     public void populateNodeLicenseRange(TimeRange totalTimeRange, ArrayList<TimeRange> timeRanges, RESTAccess access, 
             String applicationName, String tierAgentType){
+        
         MetricDatas mDatas= 
                 access.getRESTMetricQuery(getQueryType(), applicationName, node.getTierName(), node.getName(), 
                 totalTimeRange.getStart(), totalTimeRange.getEnd());
-        //What happens whe this is null ?
+        //What happens when this is null ?
         totalRangeValue=new NodeLicenseRange("Total Node Count");
         totalRangeValue.setStart(totalTimeRange.getStart());
         totalRangeValue.setEnd(totalTimeRange.getEnd());
@@ -168,6 +170,7 @@ public class NodeLicenseCount extends LicenseCount{
                 tempTotalCount++;
             }
         }
+        if(totalRangeValue == null) logger.log(Level.WARNING,"totalRangeValue is null: " + toString());
         totalRangeValue.setCount(tempTotalCount);
         totalRangeValue.setCountAsLicense(true);
     }
@@ -183,15 +186,6 @@ public class NodeLicenseCount extends LicenseCount{
     public boolean checkIfNotJava(RESTAccess access, String app, long start, long end){
         /*
          * So when the metric exists but is not populated then you get the 
-         * <metric-datas><metric-data>
-  <metricPath>Application Infrastructure Performance|1stTier|JVM|Classes|Current Loaded Class Count</metricPath>
-  <frequency>ONE_MIN</frequency>
-  <metricValues/>
-</metric-data>
-</metric-datas>osxltgsolo:appBuild gilbert.solorzano$ curl -k -u gsadmin@customer1 'http://gsappdyn01:8090/controller/rest/applications/BDR%20Big%20Deal%20Retail/mec-path=Application%20Infrastructure%20Performance%7C1stTier%7CJVM1%7CClasses%7CCurrent%20Loaded%20Class%20Count&time-range-type=BEFORE_NOW&duration-in-mins=15'
-Enter host password for user 'gsadmin@customer1':
-<metric-datas></metric-datas>
-         * 
          */
         if(s.debugLevel >= 2) 
             logger.log(Level.INFO,new StringBuilder().append("\t\tNode ").append(node.getName()).append(" is being check to see if its php, with tiername ").append(node.getTierName()).toString());

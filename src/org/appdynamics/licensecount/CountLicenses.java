@@ -15,6 +15,7 @@ import org.appdynamics.licensecount.file.WriteExcelDoc;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.Calendar;
 
 
 /**
@@ -28,12 +29,46 @@ public class CountLicenses {
     private static Logger logger=Logger.getLogger(CountLicenses.class.getName());
     private static boolean QAMODE=false;
     
-    public static void main(String[] args){
-        //String controller="appdyn02";
-        
-        LicenseOptions licOptions=new LicenseOptions(args);
-        boolean continueExec = licOptions.parse();
-        
+    public CountLicenses(){}
+    
+    public CountLicenses(String controller, String port, String user, String passwd, boolean useSSL){
+        LicenseS.CONTROLLER_V=controller;
+        LicenseS.PORT_V=port;
+        LicenseS.USERNAME_V=user;
+        LicenseS.PASSWD_V=passwd;
+        LicenseS.SSL_V=useSSL;
+    }
+    
+    public CountLicenses(String controller, String port, String user, String passwd, boolean useSSL, int interval){
+        LicenseS.CONTROLLER_V=controller;
+        LicenseS.PORT_V=port;
+        LicenseS.USERNAME_V=user;
+        LicenseS.PASSWD_V=passwd;
+        LicenseS.SSL_V=useSSL;
+        LicenseS.INTERVAL_V=interval;
+    }
+    
+    public CountLicenses(String controller, String port, String user, String passwd, boolean useSSL, int interval, boolean upToNow){
+        LicenseS.CONTROLLER_V=controller;
+        LicenseS.PORT_V=port;
+        LicenseS.USERNAME_V=user;
+        LicenseS.PASSWD_V=passwd;
+        LicenseS.SSL_V=useSSL;
+        LicenseS.NOW_V=upToNow;
+    }
+    
+    public CountLicenses(String controller, String port, String user, String passwd, boolean useSSL, int interval, boolean upToNow, String fileName){
+        LicenseS.CONTROLLER_V=controller;
+        LicenseS.PORT_V=port;
+        LicenseS.USERNAME_V=user;
+        LicenseS.PASSWD_V=passwd;
+        LicenseS.SSL_V=useSSL;
+        LicenseS.NOW_V=upToNow;
+        LicenseS.FILENAME_V=fileName;
+    }
+    
+    private static void init(){
+        long start=Calendar.getInstance().getTimeInMillis();
         StringBuilder bud = new StringBuilder();
         bud.append("\nRunning license count with the following options:");
         bud.append("\n\tController: ").append(LicenseS.CONTROLLER_V);
@@ -47,26 +82,6 @@ public class CountLicenses {
         bud.append("\n\tUptime: ").append(LicenseS.UPTIME_V);
         bud.append("\n\tDebug Level: ").append(LicenseS.DEBUG_V).append("\n");
         //
-        
-        
-        // Check if we need to be in debug
-        if(!licOptions.validDebug(LicenseS.DEBUG_V)){licOptions.printHelp();System.exit(1);}
-        else{s.debugLevel=LicenseS.DEBUG_V;}
-        
-        // Check for valid interval
-        if(!licOptions.validInterval(LicenseS.INTERVAL_V)){
-            logger.log(Level.SEVERE,new StringBuilder().append("Interval provided is ").append(LicenseS.INTERVAL_V).append(" valid intervals are between 1-35\n").toString());
-            licOptions.printHelp();
-            System.exit(1);
-        }
-        
-        // Check if we can continue executing or we must exit
-        if(!continueExec){licOptions.printHelp();System.exit(1);}
-        
-        // Check if the user provide an incorrect uptime.
-        if(LicenseS.UPTIME_V == -1.0){licOptions.printHelp();System.exit(1); }
-        else{ s.percentageThreshold=LicenseS.UPTIME_V;}
-        
         
         if(s.debugLevel > 0) logger.log(Level.INFO,bud.toString());
         
@@ -118,6 +133,7 @@ public class CountLicenses {
          * can redefine the type of object.
         */
          
+        //We can start to to thread these
         logger.log(Level.INFO,new StringBuilder().append("Populating the applications for a total of ").append(customer.getApplications().size()).append(" of applications").toString());
         customer.populateApplications(access, LicenseS.INTERVAL_V);
         //This is were we start to count the licenses.
@@ -125,11 +141,38 @@ public class CountLicenses {
         
         WriteExcelDoc excel=new WriteExcelDoc(customer);
         excel.init();
-        
-        //logger.log(Level.INFO,customer.toString());
-       
-        
-        
-        
+        long end = Calendar.getInstance().getTimeInMillis();
+        long total = (end - start)/1000;
+        logger.log(Level.INFO,"Total run time is " + total); 
     }
+    
+    public static void main(String[] args){
+        //String controller="appdyn02";
+        
+        LicenseOptions licOptions=new LicenseOptions(args);
+        boolean continueExec = licOptions.parse();
+        
+        
+        // Check if we need to be in debug
+        if(!licOptions.validDebug(LicenseS.DEBUG_V)){licOptions.printHelp();System.exit(1);}
+        else{s.debugLevel=LicenseS.DEBUG_V;}
+        
+        // Check for valid interval
+        if(!licOptions.validInterval(LicenseS.INTERVAL_V)){
+            logger.log(Level.SEVERE,new StringBuilder().append("Interval provided is ")
+                    .append(LicenseS.INTERVAL_V).append(" valid intervals are between 1-35\n").toString());
+            licOptions.printHelp();
+            System.exit(1);
+        }
+        
+        // Check if we can continue executing or we must exit
+        if(!continueExec){licOptions.printHelp();System.exit(1);}
+        
+        // Check if the user provide an incorrect uptime.
+        if(LicenseS.UPTIME_V == -1.0){licOptions.printHelp();System.exit(1); }
+        else{ s.percentageThreshold=LicenseS.UPTIME_V;}
+        
+        init();
+    }
+    
 }

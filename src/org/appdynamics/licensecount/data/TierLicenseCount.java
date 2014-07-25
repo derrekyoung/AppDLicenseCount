@@ -4,6 +4,7 @@
  */
 package org.appdynamics.licensecount.data;
 
+import org.appdynamics.licensecount.actions.*;
 import org.appdynamics.appdrestapi.RESTAccess;
 import org.appdynamics.appdrestapi.data.*;
 import org.appdynamics.appdrestapi.util.*;
@@ -114,17 +115,27 @@ public class TierLicenseCount extends LicenseCount{
             RESTAccess access, String applicationName){
         
         if(s.debugLevel >= 2) 
-            logger.log(Level.INFO,new StringBuilder().append("Populating tier ").append(name).append(" licnese count for application ").append(applicationName).toString());
+            logger.log(Level.INFO,new StringBuilder().append("Populating tier ").append(name).append(" license count for application ").append(applicationName).toString());
         
         totalRangeValue=new TierLicenseRange("Tier Total Count");
         totalRangeValue.setStart(totalTimeRange.getStart());totalRangeValue.setEnd(totalTimeRange.getEnd());
         
         /*
          * This is going to get the nodes to count all of the licenses.
+         * 
+         * This is a good point to thread out
          */
+        ThreadExecutor execNodes = new ThreadExecutor(8);
+        
         for(NodeLicenseCount nodeL:nodeLicenseCount){
-            nodeL.populateNodeLicenseRange(totalTimeRange, timeRanges, access, applicationName, tierAgentType);
+            //public NodeExecutor(NodeLicenseCount nodeLic,RESTAccess access, 
+            //String appName, TimeRange totalTimeRange, 
+            //ArrayList<TimeRange> timeRanges, String tierAgentType)
+            NodeExecutor nodeExec = new NodeExecutor(nodeL, access, applicationName, totalTimeRange, timeRanges, tierAgentType);
+            execNodes.getExecutor().execute(nodeExec);
+            //nodeL.populateNodeLicenseRange(totalTimeRange, timeRanges, access, applicationName, tierAgentType);
         }
+        execNodes.getExecutor().shutdown();
         
         MetricDatas tierAppAgents=access.getRESTMetricQuery(0, applicationName, name, totalTimeRange.getStart(), totalTimeRange.getEnd());
         MetricDatas tierMachineAgents=access.getRESTMetricQuery(1, applicationName, name, totalTimeRange.getStart(), totalTimeRange.getEnd());
@@ -132,6 +143,7 @@ public class TierLicenseCount extends LicenseCount{
         //This call doesn't do anything --delete
         getMetricValues(tierAppAgents).getMetricValue();
         
+        // This is serial
         ArrayList<TimeRange> hourlyTimeRanges=TimeRangeHelper.getHourlyTimeRanges(totalTimeRange.getStart(), totalTimeRange.getEnd());
         for(TimeRange hourRange: hourlyTimeRanges){
             TierHourLicenseRange tr=new TierHourLicenseRange(hourRange);
@@ -155,8 +167,8 @@ public class TierLicenseCount extends LicenseCount{
     //0:Java, 1:IIS, 2:PHP, 3:NodeJS, 4 Machine Agent
     public void countNodeLicenses(ArrayList<TimeRange> timeRanges,HashMap<String,ArrayList<Node>> dotNetMap){
         
-        if(s.debugLevel >= 2) 
-            logger.log(Level.INFO,new StringBuilder().append("Starting tier level license count ").toString());
+   
+        logger.log(Level.INFO,new StringBuilder().append("Starting tier level license count for tier ").append(name).toString());
         
         for(NodeLicenseCount nodeL:nodeLicenseCount){
             nodeL.countNodeLicenseRange(s.percentageThreshold);  
@@ -189,7 +201,7 @@ public class TierLicenseCount extends LicenseCount{
             HashMap<String,ArrayList<Node>> dotNetMapTemp=new HashMap<String,ArrayList<Node>>(dotNetMap);
             
             for(NodeLicenseCount node:nodeLicenseCount){
-                if(node.getRangeValues().get(i).isCountAsLicense()){
+                if(node.getRangeValues().size() > i && node.getRangeValues().get(i).isCountAsLicense()){
 //                    if(s.debugLevel >= 2) 
 //            logger.log(Level.INFO,new StringBuilder().append("\t\tCounting node type ").append(node.getType()).toString());
                     switch(node.getType()){

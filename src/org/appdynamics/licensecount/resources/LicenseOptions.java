@@ -113,6 +113,9 @@ public class LicenseOptions {
             cmdLine = parser.parse( options, arguments );
             boolean printHelp=false;
             
+            /* Check to see if we have a config */
+            
+            
             /* Required */
             if(!cmdLine.hasOption(LicenseS.USERNAME_L) || !cmdLine.hasOption(LicenseS.USERNAME_S)){
                 logger.log(Level.INFO, LicenseS.OPTION_ERROR_1 + " 1");

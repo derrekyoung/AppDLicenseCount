@@ -64,6 +64,15 @@ public class LicenseS extends OPTS{
     public static final boolean NOW_A=false;
     public static boolean NOW_V=false;
     
+    //Log File
+    
+    public static final String LOGFILE_L="logfile";
+    public static final String LOGFILE_S="L";
+    public static final String LOGFILE_D="Path to the log file";
+    public static final boolean LOGFILE_R=false;
+    public static final boolean LOGFILE_A=true;
+    public static String LOGFILE_V="";
+    
     
     public static final String USAGE="java -jar AppDynamicsLC.jar";
     public static final String FILE_ENDING="_LicenseCount.xlsx";
@@ -110,5 +119,51 @@ public class LicenseS extends OPTS{
     
     public static final String AGENT_TYPE_OTHER="Other";
     public static final String AGENT_NAME_OTHER_AGENT="Other";
+    
+    
+    /*
+     * <!--> XML Strings <-->
+     * <license-counts>
+   <license-count>
+    <server-config> 
+        <controller Port="443" useSSL="true">familysearch.saas.appdynamics.com</controller>
+        <account>familysearch</account>
+        <user>fsrestclient</user>
+        <password>BFm81Etzrdvd7rcwDhWfMIyG9TbwKJR+</password>
+    </server-config>
+    <optional-options>
+        <applications/> 
+        <interval upToNow="false"/>
+        <fileName/>
+        <upTime/>
+        <logFile debugLevel="0"/>
+    </optional-options>
+    </license-count>
+</license-counts>
+     * 
+     */
+    public static final String LICENSE_COUNTS="license-counts";
+    public static final String LICENSE_COUNT="license-count";
+    public static final String SERVER_CONFIG="server-config";
+    public static final String CONTROLLER="controller";
+    public static final String ACCOUNT="account";
+    public static final String USER="user";
+    public static final String PASSWORD="password";
+    public static final String OPTIONAL_OPTIONS="optional-options";
+    public static final String APPLICATIONS="applications";
+    public static final String INTERVAL="interval";
+    public static final String UPTONOW="upToNow";
+    public static final String FILENAME="fileName";
+    public static final String UPTIME="uptime";
+    public static final String LOGFILE="logFile";
+    public static final String DEBUG_LEVEL="debugLevel";
+    
+    public static final String L1="\n    ";
+    public static final String L2="\n\t";
+    public static final String L3="\n\t    ";
+    public static final String L4="\n\t\t";
+    public static final String L5="\n\t\t    ";
+    public static final String L6="\n\t\t\t";
+    public static final String VE=" = ";
     
 }

@@ -63,6 +63,7 @@
           </manifest>
           <fileset dir="${build.dir}">
             <include name="org/appdynamics/licensecount/CountLicenses.class"/>
+            <include name="org/appdynamics/licensecount/actions/*.class"/>
             <include name="org/appdynamics/licensecount/data/*.class"/>
             <include name="org/appdynamics/licensecount/file/*.class"/>
             <include name="org/appdynamics/licensecount/resources/*.class"/>
