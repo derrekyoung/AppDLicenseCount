@@ -209,7 +209,7 @@ public class TierLicenseCount extends LicenseCount{
                             bud.append(" and iisInternalCount orig value ").append(tRange.iisInternalCount);
                             tRange.iisInternalCount++;
                             bud.append("\n\tiisCount new value ").append(tRange.iisCount).append(" and iisInternalCount new value ").append(tRange.iisInternalCount);
-                            logger.log(Level.INFO,bud.toString());
+                            //logger.log(Level.INFO,bud.toString());
                             //tRange.iisCount+=node.getLicWeight();
                             //tRange.totalCount+=node.getLicWeight();
                             break;
