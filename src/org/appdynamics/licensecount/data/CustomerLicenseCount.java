@@ -96,7 +96,7 @@ public class CustomerLicenseCount extends LicenseCount{
                 aRange.machineCount+=tRange.getMachineCount();
                 aRange.phpCount+=tRange.getPhpCount();
                 aRange.totalCount+=tRange.getTotalCount();
-                aRange.iisInternalCount+=tRange.iisInternalCount;
+                aRange.iisInternalCount+=tRange.getIisInternalCount();
                 
             }
             //logger.log(Level.INFO, "Value of iisCount " + aRange.iisCount);

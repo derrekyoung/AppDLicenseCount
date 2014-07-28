@@ -163,35 +163,21 @@ public class TierLicenseCount extends LicenseCount{
         
     }
     
+    public String getNodeKey(TierLicenseRange tRange, String machineName){
+        StringBuilder bud = new StringBuilder();
+        bud.append(tRange.getStart()).append("-").append(tRange.getEnd()).append("-").append(machineName);        
+        return bud.toString();
+    }
     
     //0:Java, 1:IIS, 2:PHP, 3:NodeJS, 4 Machine Agent
-    public void countNodeLicenses(ArrayList<TimeRange> timeRanges,HashMap<String,ArrayList<Node>> dotNetMap){
+    public void countNodeLicenses(ArrayList<TimeRange> timeRanges,HashMap<String,ArrayList<Node>> dotNetMap, ArrayList<String> dotNetKeys){
         
    
         logger.log(Level.INFO,new StringBuilder().append("Starting tier level license count for tier ").append(name).toString());
         
         for(NodeLicenseCount nodeL:nodeLicenseCount){
             nodeL.countNodeLicenseRange(s.percentageThreshold);  
-        }
-        
-        
-        
-        logger.log(Level.INFO,"Start to get the license weights for the nodes " + dotNetMap.keySet().size());
-        // This is now going to get the counts for the .Net and php agents.
-        for(String key: dotNetMap.keySet()){
-            double size = dotNetMap.get(key).size();
-            double piePiece=1/size;
-            StringBuilder bud=new StringBuilder().append("DotNet license for ").append(key).append(" is used by ").append(size).append(" nodes, and has a weight of ").append(piePiece).append(" per node\n");
-            for(Node node: dotNetMap.get(key)){
-                //For every node in the array, we are going to add this to the count.
-                updateLicenseWeight(piePiece, node);
-                iis+=piePiece;
-                bud.append("\tDotNet license usage for tier ").append(getName()).append(" is ").append(iis).append("\n");
-            }
-            logger.log(Level.INFO,bud.toString());
-        }
-        
-        
+        } 
         
         for(int i=0; i < timeRanges.size(); i++){
             TierLicenseRange tRange = new TierLicenseRange();
@@ -199,7 +185,7 @@ public class TierLicenseCount extends LicenseCount{
             tRange.setEnd(timeRanges.get(i).getEnd());
             tRange.setName(tRange.createName());
             HashMap<String,ArrayList<Node>> dotNetMapTemp=new HashMap<String,ArrayList<Node>>(dotNetMap);
-            
+            ArrayList<String> found=new ArrayList<String>();
             for(NodeLicenseCount node:nodeLicenseCount){
                 if(node.getRangeValues().size() > i && node.getRangeValues().get(i).isCountAsLicense()){
 //                    if(s.debugLevel >= 2) 
@@ -208,14 +194,22 @@ public class TierLicenseCount extends LicenseCount{
                         case 1:
                             //We don't do anything for now, this is will be added up later.
                             //logger.log(Level.INFO,"Adding DotNet " + node.getLicWeight());
-                            //StringBuilder bud = new StringBuilder();
-                            //bud.append("Adding .Net to ").append(node.getNode().getTierName()).append(" orig value ").append(tRange.iisCount);
-                            if(dotNetMapTemp.containsKey(node.getMachineName())){
+                            
+                            StringBuilder bud = new StringBuilder();
+                            bud.append("\n\tAdding .Net node ").append(node.getNode().getName()).append("\n\tiisCount orig value ").append(tRange.iisCount);
+                            if(dotNetMapTemp.containsKey(node.getMachineName()) && !found.contains(node.getMachineName())
+                                    && ! dotNetKeys.contains(getNodeKey(tRange,node.getMachineName()))){
                                 tRange.iisCount++;
                                 tRange.totalCount++;
-                                dotNetMapTemp.remove(node.getMachineName());
+                                found.add(node.getMachineName());//dotNetMapTemp.remove(node.getMachineName());
+                                dotNetKeys.add(getNodeKey(tRange,node.getMachineName()));
+                                bud.append("\n----------------------------------------\n start:").append(tRange.getStart()).append(" -- ").append(tRange.getEnd());
+                                bud.append(" :: ").append(node.getNode().getTierName());
                             }
+                            bud.append(" and iisInternalCount orig value ").append(tRange.iisInternalCount);
                             tRange.iisInternalCount++;
+                            bud.append("\n\tiisCount new value ").append(tRange.iisCount).append(" and iisInternalCount new value ").append(tRange.iisInternalCount);
+                            logger.log(Level.INFO,bud.toString());
                             //tRange.iisCount+=node.getLicWeight();
                             //tRange.totalCount+=node.getLicWeight();
                             break;
@@ -282,6 +276,7 @@ public class TierLicenseCount extends LicenseCount{
     }
     
 
+    
     @Override
     public String toString(){
         StringBuilder bud=new StringBuilder();

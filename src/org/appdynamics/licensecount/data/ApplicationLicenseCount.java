@@ -31,6 +31,7 @@ public class ApplicationLicenseCount extends LicenseCount{
     private HashMap<Integer,TierLicenseCount> tierLicenses=new HashMap<Integer,TierLicenseCount>(); 
     private ArrayList<ApplicationLicenseRange> appLicenseRange= new ArrayList<ApplicationLicenseRange>();
     private ArrayList<AppHourLicenseRange> appHourLicenseRange=new ArrayList<AppHourLicenseRange>();
+    private ArrayList<String> dotNetKeys=new ArrayList<String>();
     private ApplicationLicenseRange totalRangeValue;
     private HashMap<String,ArrayList<Node>> dotNetMap=new HashMap<String,ArrayList<Node>>();
     
@@ -112,7 +113,7 @@ public class ApplicationLicenseCount extends LicenseCount{
          */
         //logger.log(Level.INFO,"Starting the nodeLicense count.");
         for(TierLicenseCount tCount: tierLicenses.values()){
-            tCount.countNodeLicenses(timeRanges,dotNetMap);
+            tCount.countNodeLicenses(timeRanges,dotNetMap,dotNetKeys);
         }
         
         for(int i=0; i < timeRanges.size(); i++){
@@ -221,6 +222,7 @@ public class ApplicationLicenseCount extends LicenseCount{
         this.totalRangeValue = totalRangeValue;
     }
 
+
     public void populateDotNetMap(){
         dotNetMap=new HashMap<String,ArrayList<Node>>();
         for(TierLicenseCount tier: tierLicenses.values()){
@@ -237,6 +239,25 @@ public class ApplicationLicenseCount extends LicenseCount{
                 }
             }
         }
+        
+        
+        logger.log(Level.INFO,"Start to get the license weights for the nodes " + dotNetMap.keySet().size());
+        // This is now going to get the counts for the .Net and php agents.
+        for(String key: dotNetMap.keySet()){
+            double size = dotNetMap.get(key).size();
+            double piePiece=1/size;
+            StringBuilder bud=new StringBuilder().append("DotNet license for ").append(key).append(" is used by ")
+                    .append(size).append(" nodes.\n");
+            for(Node node: dotNetMap.get(key)){
+                //For every node in the array, we are going to add this to the count.
+                //node.updateLicenseWeight(piePiece, node);
+                //iis+=piePiece;
+                bud.append("\tDotNet license usage in tier ").append(node.getTierName()).append(" for node ").append(node.getName())
+                        .append("\n");
+            }
+            logger.log(Level.INFO,bud.toString());
+        }
+                
         
     }
 

@@ -66,6 +66,16 @@ public class TierLicenseRange extends TimeRange{
         this.totalCount = totalCount;
     }
 
+    public double getIisInternalCount() {
+        return iisInternalCount;
+    }
+
+    public void setIisInternalCount(double iisInternalCount) {
+        this.iisInternalCount = iisInternalCount;
+    }
+    
+    
+
     public double getTierAppAgentCount() {
         return tierAppAgentCount;
     }

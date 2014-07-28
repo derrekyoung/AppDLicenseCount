@@ -120,7 +120,7 @@ public class LicenseS extends OPTS{
     public static final String AGENT_TYPE_OTHER="Other";
     public static final String AGENT_NAME_OTHER_AGENT="Other";
     
-    
+    public static final String EUM_PAGES_PATH="End User Experience|Base Pages";
     /*
      * <!--> XML Strings <-->
      * <license-counts>
