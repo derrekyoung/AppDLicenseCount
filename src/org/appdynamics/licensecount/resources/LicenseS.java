@@ -158,6 +158,9 @@ public class LicenseS extends OPTS{
     public static final String LOGFILE="logFile";
     public static final String DEBUG_LEVEL="debugLevel";
     
+    //Base Pages query
+    public static final String BASE_PAGES="End User Experience|Base Pages";
+    
     public static final String L1="\n    ";
     public static final String L2="\n\t";
     public static final String L3="\n\t    ";

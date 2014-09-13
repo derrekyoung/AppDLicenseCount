@@ -140,8 +140,8 @@ public class NodeLicenseCount extends LicenseCount{
                             logger.log(Level.INFO,new StringBuilder().append("\n\tIt is not java").toString());
                     boolean fnd=false;
                     if(checkIfPHP(tierAgentType)){ type=2;fnd=true;}
-                    if(checkIfNodeJs(tierAgentType)){ type=3;fnd=true;}
-                    if(checkIfDotNet(tierAgentType)){type=1;fnd=true;}
+                    if(!fnd && checkIfNodeJs(tierAgentType)){ type=3;fnd=true;}
+                    if(!fnd && checkIfDotNet(tierAgentType)){type=1;fnd=true;}
                     if(!fnd)type=2;
                 }else{
                     type = 0;
@@ -197,16 +197,19 @@ public class NodeLicenseCount extends LicenseCount{
     }
     
     public boolean checkIfPHP(String tierAgentType){
-        if(tierAgentType.matches("(?i)php")) return true;
+        //logger.log(Level.INFO,new StringBuilder().append("\n\n\t\tCheck for Php ").append(tierAgentType).toString());
+        if(tierAgentType.matches("(?i).*php.*")) return true;
         return false;
     }
     
     public boolean checkIfNodeJs(String tierAgentType){
-        if(tierAgentType.matches("(?i)node")) return true;
+        //logger.log(Level.INFO,new StringBuilder().append("\n\n\t\tCheck for Node ").append(tierAgentType).toString());
+        if(tierAgentType.matches("(?i).*node.*")) return true;
         return false;
     }
     
     public boolean checkIfDotNet(String tierAgentType){
+        //logger.log(Level.INFO,new StringBuilder().append("\n\n\t\tCheck for .Net ").append(tierAgentType).toString());
         if(tierAgentType.contains("DOT_NET")) return true;
         
         return false;
