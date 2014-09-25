@@ -57,9 +57,17 @@ public class TierLicenseCount extends LicenseCount{
     
     // We return the node so that we can work with it.
     public NodeLicenseCount addNodeRange(Node node){
-        NodeLicenseCount nodeL=new NodeLicenseCount(node);
-        nodeCount++;
-        nodeLicenseCount.add(nodeL);
+        
+        NodeLicenseCount nodeL=null;
+        try{
+            nodeL=new NodeLicenseCount(node);
+            nodeCount++;
+            nodeLicenseCount.add(nodeL);
+        }catch(Exception e){
+            StringBuilder bud =new StringBuilder();
+            bud.append("Exception occurred while attempting to get node information for ").append(node.toString()).append("\n\t\tNode will not be counted.");
+            logger.log(Level.SEVERE, bud.toString());
+        }    
         return nodeL;
     }
 
