@@ -5,6 +5,7 @@
 package org.appdynamics.licensecount.data;
 
 import org.appdynamics.appdrestapi.util.TimeRange;
+import org.appdynamics.licensecount.resources.LicenseS;
 
 /**
  *
@@ -44,6 +45,16 @@ public class TierLicenseRange extends TimeRange{
 
     public double getNodeJSCount() {
         return nodeJSCount;
+    }
+    
+    public String getNodeJSCount_C(){
+        double val1 = nodeJSCount/10;
+        return new StringBuilder().append(LicenseS.licenseRound(val1)).append("(").append(nodeJSCount).append(")").toString();
+    }
+    
+    public String getNodeJSCount_TA(){
+        double val1 = nodeJSCount/10;
+        return new StringBuilder().append(val1).append("(").append(nodeJSCount).append(")").toString();
     }
 
     public void setNodeJSCount(int nodeJSCount) {

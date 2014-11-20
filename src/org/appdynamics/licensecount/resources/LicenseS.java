@@ -88,12 +88,16 @@ public class LicenseS extends OPTS{
     public static final String TIER_SUMMARY="Tier Summary";
     public static final String HOURLY_TIER_SUMMARY="Hourly Tier Summary";
     public static final String NODE_INFO_SUMMARY="Node Info Summary";
+    public static final String TIERS_WITH_NO_NODES="Tiers With No Nodes";
     
     public static final String CUSTOMER_NAME="Cutomer Name";
     public static final String APPLICATION_NAME="Application Name";
     public static final String TIER_NAME="Tier Name";
     public static final String NODE_NAME="Node Name";
     public static final String AGENT_TYPE="Agent Type";
+    public static final String TIER_TYPE="Tier Type";
+    public static final String TIER_AGENT_TYPE="Tier Agent Type";
+    public static final String TIER_ID="Tier ID";
   
     
     public static final String TOTAL_AGENT_COUNT="Total Agent Count";
@@ -168,5 +172,22 @@ public class LicenseS extends OPTS{
     public static final String L5="\n\t\t    ";
     public static final String L6="\n\t\t\t";
     public static final String VE=" = ";
+    
+    public static int licenseRound(double licenseC){
+        String numString = new Double(licenseC).toString();
+        if(numString.contains(".")){
+            String decimalValue = numString.split("\\.")[1];
+            String integerValue = numString.split("\\.")[0];
+            try{
+                Double decimalDouble = new Double(decimalValue);
+                Integer value = new Integer(integerValue);
+                if(decimalDouble > 0) return (value + 1);
+            }catch(Exception e){
+                
+            }
+        }
+        
+        return new Double(licenseC).intValue();
+    }
     
 }

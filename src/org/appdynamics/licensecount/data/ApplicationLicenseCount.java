@@ -7,9 +7,6 @@ package org.appdynamics.licensecount.data;
 import org.appdynamics.appdrestapi.RESTAccess;
 import org.appdynamics.appdrestapi.data.*;
 import org.appdynamics.appdrestapi.resources.s;
-import org.appdynamics.licensecount.resources.LicenseS;
-import org.appdynamics.licensecount.resources.LicenseOptions;
-import org.appdynamics.licensecount.actions.ThreadExecutor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +25,7 @@ public class ApplicationLicenseCount extends LicenseCount{
     private String applicationName;
     private int applicationId;
     private int tierCount=0;
+    private HashMap<Integer,Tier> tierLicensesNoNodes=new HashMap<Integer,Tier>(); 
     private HashMap<Integer,TierLicenseCount> tierLicenses=new HashMap<Integer,TierLicenseCount>(); 
     private ArrayList<ApplicationLicenseRange> appLicenseRange= new ArrayList<ApplicationLicenseRange>();
     private ArrayList<AppHourLicenseRange> appHourLicenseRange=new ArrayList<AppHourLicenseRange>();
@@ -84,6 +82,8 @@ public class ApplicationLicenseCount extends LicenseCount{
                 if(tierLicenses.containsKey(tier.getId())){
                     tierLicenses.get(tier.getId()).setTierId(tier.getId());
                     tierLicenses.get(tier.getId()).setTierAgentType(tier.getAgentType());
+                }else{
+                    tierLicensesNoNodes.put(tier.getId(), tier);
                 }
             }
         }
@@ -164,7 +164,16 @@ public class ApplicationLicenseCount extends LicenseCount{
         }
         
     }
-                          
+
+    public HashMap<Integer, Tier> getTierLicensesNoNodes() {
+        return tierLicensesNoNodes;
+    }
+
+    public void setTierLicensesNoNodes(HashMap<Integer, Tier> tierLicensesNoNodes) {
+        this.tierLicensesNoNodes = tierLicensesNoNodes;
+    }
+                   
+    
 
     public String getApplicationName() {
         return applicationName;

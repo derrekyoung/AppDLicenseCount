@@ -16,6 +16,7 @@ import org.appdynamics.licensecount.data.CustomerLicenseRange;
 import org.appdynamics.licensecount.data.TierLicenseCount;
 import org.appdynamics.licensecount.data.ApplicationLicenseCount;
 import org.appdynamics.licensecount.data.CustomerLicenseCount;
+import org.appdynamics.appdrestapi.data.Tier;
 
 
 import java.io.File;
@@ -55,9 +56,12 @@ public class WriteExcelDoc {
         XSSFSheet licenseTiers = workbook.createSheet(LicenseS.TIER_SUMMARY);
         XSSFSheet licenseHourlyTiers = workbook.createSheet(LicenseS.HOURLY_TIER_SUMMARY);
         XSSFSheet licenseNodeInfo = workbook.createSheet(LicenseS.NODE_INFO_SUMMARY);
+        XSSFSheet licenseNoNodeTiers = workbook.createSheet(LicenseS.TIERS_WITH_NO_NODES);
+        
         style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.RIGHT);
         addNodeInfo(licenseNodeInfo);
+        addTierWNoNodeInfo(licenseNoNodeTiers);
         // Lets create the first row which will be the header.
         int headerRowIndex=0;
         Row headerRow = licenseSummary.createRow(headerRowIndex);
@@ -73,9 +77,7 @@ public class WriteExcelDoc {
         Cell cell_3 = hourlyTierRow.createCell(i);cell_3.setCellValue(LicenseS.APPLICATION_NAME);
         cell_3 = hourlyTierRow.createCell(i+1);cell_3.setCellValue(LicenseS.TIER_NAME);
         
-        
-        
-        
+
         i+=2;
         
         int columnCount=2;
@@ -229,7 +231,9 @@ public class WriteExcelDoc {
 
                     case 4: //NodeJS Agent
                         cell = rows.get(i).createCell(columnCount);
-                        cell.setCellValue(cRange.getNodeJSCount());
+                        
+                        cell.setCellValue(cRange.getNodeJSCount_C());
+                        cell.setCellStyle(style);
                         break;
                         
                     case 5: //Machine Agent
@@ -330,7 +334,8 @@ public class WriteExcelDoc {
 
                     case 4: //NodeJS Agent
                         cell = rows.get(i).createCell(columnCount);
-                        cell.setCellValue(cRange.getNodeJSCount());
+                        cell.setCellValue(cRange.getNodeJSCount_TA());
+                        cell.setCellStyle(style);
      
                         break;
                         
@@ -436,7 +441,8 @@ public class WriteExcelDoc {
 
                     case 4: //NodeJS Agent
                         cell = rows.get(i).createCell(columnCount);
-                        cell.setCellValue(cRange.getNodeJSCount());
+                        cell.setCellValue(cRange.getNodeJSCount_TA());
+                        cell.setCellStyle(style);
      
                         break;
                         
@@ -630,6 +636,52 @@ public class WriteExcelDoc {
                     cell.setCellValue(getDescription(nodeCount));
                     row++;
                 }
+            }
+        }
+        
+        
+    }
+    
+    public void addTierWNoNodeInfo(XSSFSheet curSheet){
+        // Create the header
+        int row=0;
+        Row mainRow = curSheet.createRow(row);
+        row+=2;
+
+   
+        Cell cell = mainRow.createCell(0);
+        cell.setCellValue(LicenseS.APPLICATION_NAME);
+        cell = mainRow.createCell(1);
+        cell.setCellValue(LicenseS.TIER_ID);
+        cell = mainRow.createCell(2);
+        cell.setCellValue(LicenseS.TIER_NAME);
+        cell = mainRow.createCell(3);
+        cell.setCellValue(LicenseS.TIER_TYPE);
+        cell = mainRow.createCell(4);
+        cell.setCellValue(LicenseS.TIER_AGENT_TYPE);
+        
+        
+        Iterator<Integer> appIter = customer.getApplications().keySet().iterator();
+        while(appIter.hasNext()){
+            Integer appId = appIter.next();
+            ApplicationLicenseCount appCount = customer.getApplications().get(appId);
+            Iterator<Integer> tierIter = appCount.getTierLicensesNoNodes().keySet().iterator();
+            while(tierIter.hasNext()){
+                Integer tierId = tierIter.next();
+                Tier tierCount = appCount.getTierLicensesNoNodes().get(tierId);
+                    mainRow = curSheet.createRow(row);
+                    cell = mainRow.createCell(0);
+                    cell.setCellValue(appCount.getApplicationName());
+                    cell = mainRow.createCell(1);
+                    cell.setCellValue(tierCount.getId());
+                    cell = mainRow.createCell(2);
+                    cell.setCellValue(tierCount.getName());
+                    // This is when we pick the agent type
+                    cell = mainRow.createCell(3);
+                    cell.setCellValue(tierCount.getType());
+                    cell = mainRow.createCell(4);
+                    cell.setCellValue(tierCount.getAgentType());
+                    row++;
             }
         }
         

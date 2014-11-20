@@ -46,6 +46,7 @@ public class NodeLicenseCount extends LicenseCount{
     
     @SuppressWarnings("OverridableMethodCallInConstructor")
     public NodeLicenseCount(Node node){
+        super();
         this.node=node;
         this.setInformation();
     }

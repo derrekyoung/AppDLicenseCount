@@ -144,6 +144,7 @@ public class TierLicenseCount extends LicenseCount{
             //nodeL.populateNodeLicenseRange(totalTimeRange, timeRanges, access, applicationName, tierAgentType);
         }
         execNodes.getExecutor().shutdown();
+        execNodes.shutdown();
         
         MetricDatas tierAppAgents=access.getRESTMetricQuery(0, applicationName, name, totalTimeRange.getStart(), totalTimeRange.getEnd());
         MetricDatas tierMachineAgents=access.getRESTMetricQuery(1, applicationName, name, totalTimeRange.getStart(), totalTimeRange.getEnd());
