@@ -49,12 +49,16 @@ public class TierLicenseRange extends TimeRange{
     
     public String getNodeJSCount_C(){
         double val1 = nodeJSCount/10;
-        return new StringBuilder().append(LicenseS.licenseRound(val1)).append("(").append(new Double(nodeJSCount).intValue()).append(")").toString();
+        return new StringBuilder().append(LicenseS.licenseRound(val1))
+                .append("(").append(new Double(nodeJSCount).intValue())
+                .append(")").toString();
     }
     
     public String getNodeJSCount_TA(){
         double val1 = nodeJSCount/10;
-        return new StringBuilder().append(val1).append("(").append(new Double(nodeJSCount).intValue()).append(")").toString();
+        return new StringBuilder().append(val1).append("(")
+                .append(new Double(nodeJSCount).intValue())
+                .append(")").toString();
     }
 
     public void setNodeJSCount(int nodeJSCount) {
@@ -105,7 +109,8 @@ public class TierLicenseRange extends TimeRange{
     
     public String getDotNetCount(){
         StringBuilder bud = new StringBuilder();
-        bud.append(new Double(iisCount).intValue()).append(" (").append(new Double(iisInternalCount).intValue()).append(")");
+        bud.append(new Double(iisCount).intValue()).append(" (")
+                .append(new Double(iisInternalCount).intValue()).append(")");
         return bud.toString();
     }
     
