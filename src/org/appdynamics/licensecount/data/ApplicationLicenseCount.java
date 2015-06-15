@@ -32,6 +32,7 @@ public class ApplicationLicenseCount extends LicenseCount{
     private ArrayList<String> dotNetKeys=new ArrayList<String>();
     private ApplicationLicenseRange totalRangeValue;
     private HashMap<String,ArrayList<Node>> dotNetMap=new HashMap<String,ArrayList<Node>>();
+    private HashMap<String,ArrayList<String>> dotNetMapLog=new HashMap<String,ArrayList<String>>();
     
     
 
@@ -255,21 +256,37 @@ public class ApplicationLicenseCount extends LicenseCount{
         for(String key: dotNetMap.keySet()){
             double size = dotNetMap.get(key).size();
             double piePiece=1/size;
-            StringBuilder bud=new StringBuilder().append("DotNet license for ").append(key).append(" is used by ")
+            StringBuilder bud=new StringBuilder();
+            StringBuilder scr=new StringBuilder().append("DotNet license for ").append(key).append(" is used by ")
                     .append(size).append(" nodes.\n");
+            ArrayList<String> mLog=new ArrayList<String>();
+            mLog.add(scr.toString());
+            bud.append(scr);
             for(Node node: dotNetMap.get(key)){
                 //For every node in the array, we are going to add this to the count.
                 //node.updateLicenseWeight(piePiece, node);
                 //iis+=piePiece;
-                bud.append("\tDotNet license usage in tier ").append(node.getTierName()).append(" for node ").append(node.getName())
-                        .append("\n");
+                scr=new StringBuilder().append("\tDotNet license usage in tier '").append(node.getTierName()).append("' for node '").append(node.getName())
+                        .append("'\n");
+                bud.append(scr.toString());
+                mLog.add(scr.toString());
             }
+            if(!mLog.isEmpty()) dotNetMapLog.put(key, mLog);
             logger.log(Level.INFO,bud.toString());
         }
                 
         
     }
 
+    public HashMap<String, ArrayList<String>> getDotNetMapLog() {
+        return dotNetMapLog;
+    }
+
+    public void setDotNetMapLog(HashMap<String, ArrayList<String>> dotNetMapLog) {
+        this.dotNetMapLog = dotNetMapLog;
+    }
+
+    
     public HashMap<String, ArrayList<Node>> getDotNetMap() {
         return dotNetMap;
     }

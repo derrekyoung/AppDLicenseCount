@@ -89,6 +89,9 @@ public class LicenseS extends OPTS{
     public static final String HOURLY_TIER_SUMMARY="Hourly Tier Summary";
     public static final String NODE_INFO_SUMMARY="Node Info Summary";
     public static final String TIERS_WITH_NO_NODES="Tiers With No Nodes";
+    public static final String DOTNET_NODE_MAP="DotNet Node Map";
+    public static final String WINDOWS_HOST="Windows Host";
+    public static final String WINDOWS_MAPPING="Windows Mapping";
     
     public static final String CUSTOMER_NAME="Cutomer Name";
     public static final String APPLICATION_NAME="Application Name";

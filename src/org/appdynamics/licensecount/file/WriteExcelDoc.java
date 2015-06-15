@@ -57,11 +57,13 @@ public class WriteExcelDoc {
         XSSFSheet licenseHourlyTiers = workbook.createSheet(LicenseS.HOURLY_TIER_SUMMARY);
         XSSFSheet licenseNodeInfo = workbook.createSheet(LicenseS.NODE_INFO_SUMMARY);
         XSSFSheet licenseNoNodeTiers = workbook.createSheet(LicenseS.TIERS_WITH_NO_NODES);
+        XSSFSheet licenseDotNetNodeMap = workbook.createSheet(LicenseS.DOTNET_NODE_MAP);
         
         style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.RIGHT);
         addNodeInfo(licenseNodeInfo);
         addTierWNoNodeInfo(licenseNoNodeTiers);
+        addDotNetMap(licenseDotNetNodeMap);
         // Lets create the first row which will be the header.
         int headerRowIndex=0;
         Row headerRow = licenseSummary.createRow(headerRowIndex);
@@ -683,6 +685,66 @@ public class WriteExcelDoc {
                     cell.setCellValue(tierCount.getAgentType());
                     row++;
             }
+        }
+        
+        
+    }
+    
+    //DotNet
+    public void addDotNetMap(XSSFSheet curSheet){
+        // Create the header
+        int row=0;
+        Row mainRow = curSheet.createRow(row);
+        row+=2;
+
+   
+        Cell cell = mainRow.createCell(0);
+        cell.setCellValue(LicenseS.APPLICATION_NAME);
+        cell = mainRow.createCell(1);
+        cell.setCellValue(LicenseS.WINDOWS_HOST);
+        cell = mainRow.createCell(2);
+        cell.setCellValue(LicenseS.WINDOWS_MAPPING);
+
+        
+        
+        Iterator<Integer> appIter = customer.getApplications().keySet().iterator();
+        while(appIter.hasNext()){
+            Integer appId = appIter.next();
+            ApplicationLicenseCount appCount = customer.getApplications().get(appId);
+            Iterator<String> keys = appCount.getDotNetMapLog().keySet().iterator();
+            int count=0;
+            
+            /*
+            mainRow = curSheet.createRow(row);
+            cell = mainRow.createCell(0);
+            cell.setCellValue(appCount.getApplicationName());
+            row++;
+            int count=0;
+            mainRow = curSheet.createRow(row);
+            */
+            while(keys.hasNext()){
+                if(count == 0){
+                    mainRow = curSheet.createRow(row);
+                    cell = mainRow.createCell(0);
+                    cell.setCellValue(appCount.getApplicationName());
+                    row++;
+                    count++;
+                    mainRow = curSheet.createRow(row);
+                }
+                String key=keys.next();
+                cell = mainRow.createCell(1);
+                cell.setCellValue(key);
+                row++;
+                //We need to iterate again
+                for(String val: appCount.getDotNetMapLog().get(key)){  
+                    mainRow = curSheet.createRow(row);
+                    cell = mainRow.createCell(2);
+                    cell.setCellValue(val);
+                    row++;
+                }
+                row++;
+            }
+
         }
         
         
