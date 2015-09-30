@@ -66,6 +66,15 @@ public class CountLicenses {
         LicenseS.NOW_V=upToNow;
         LicenseS.FILENAME_V=fileName;
     }
+
+    public CountLicenses(String controller, String port, String user, String passwd, boolean useSSL, String groupFile){
+        LicenseS.CONTROLLER_V=controller;
+        LicenseS.PORT_V=port;
+        LicenseS.USERNAME_V=user;
+        LicenseS.PASSWD_V=passwd;
+        LicenseS.SSL_V=useSSL;
+        LicenseS.GROUP_V=groupFile;
+    }
     
     private static void init(){
         long start=Calendar.getInstance().getTimeInMillis();
@@ -80,6 +89,7 @@ public class CountLicenses {
         bud.append("\n\tFile Name: ").append(LicenseS.FILENAME_V);
         bud.append("\n\tInterval: ").append(LicenseS.INTERVAL_V);
         bud.append("\n\tUptime: ").append(LicenseS.UPTIME_V);
+        bud.append("\n\tGrouping file Name: ").append(LicenseS.GROUP_V);
         bud.append("\n\tDebug Level: ").append(LicenseS.DEBUG_V).append("\n");
         //
         

@@ -7,11 +7,14 @@ package org.appdynamics.licensecount.data;
 import org.appdynamics.appdrestapi.RESTAccess;
 import org.appdynamics.appdrestapi.resources.s;
 import org.appdynamics.licensecount.actions.ThreadExecutor;
+import org.appdynamics.licensecount.resources.LicenseS;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -26,6 +29,7 @@ public class CustomerLicenseCount extends LicenseCount{
     private String name;
     private HashMap<Integer,ApplicationLicenseCount> applications=new HashMap<Integer,ApplicationLicenseCount>();
     private ArrayList<CustomerLicenseRange> customerRangeValues=new ArrayList<CustomerLicenseRange>();
+    private HashMap<String, ArrayList<ApplicationLicenseCount>> groupings=new HashMap<String, ArrayList<ApplicationLicenseCount>>();
     private CustomerLicenseRange totalRangeValue;
     
     private ArrayList<org.appdynamics.appdrestapi.util.TimeRange> timeRanges=new ArrayList<org.appdynamics.appdrestapi.util.TimeRange>();
@@ -183,7 +187,64 @@ public class CustomerLicenseCount extends LicenseCount{
     public void setTotalRange(org.appdynamics.appdrestapi.util.TimeRange totalRange) {
         this.totalRange = totalRange;
     }
+
+    public void aggregateByGroup(HashMap<Integer,ApplicationLicenseCount> applications) {
+        String line = null;
+        try {
+            FileReader fileReader = new FileReader(LicenseS.GROUP_V);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            logger.log(Level.INFO, "Found " + LicenseS.GROUP_V);
+
+            
+            while((line = bufferedReader.readLine()) != null) {
+                
+                String[] tokens = line.split(":");
+                String group = tokens[0];
+                String[] appsString = tokens[1].split(",");
+                //add logic for dealing with apps with *
+                ArrayList<ApplicationLicenseCount> apps = new ArrayList<ApplicationLicenseCount>(); 
+                int segmentSize = 0;
+                String[] appSegment = null;
+                
+                for (String gApp:appsString) {
+                    logger.log(Level.INFO, "This is the app I'm looking for " + gApp);
+                    if (gApp.contains("*")) {
+                            appSegment = gApp.split("\\*", -1);
+                            segmentSize = appSegment.length;
+                    }
+                    // need to get app id
+                    for(Entry<Integer, ApplicationLicenseCount> entry : applications.entrySet() ) {
+                        if (gApp.contains("*")) {
+                            if ( entry.getValue().getApplicationName().startsWith(appSegment[0]) ) {
+                                for ( int i=1; i<=segmentSize-1; i++ ) {
+                                    if ( i == segmentSize-1 ) { //reached end of the search string
+                                        if ( entry.getValue().getApplicationName().contains(appSegment[i])) {
+                                            apps.add(entry.getValue());
+                                        }
+                                        break;
+                                    } if ( !entry.getValue().getApplicationName().contains(appSegment[i])) { //DOES NOT contain value
+                                        break;
+                                    }
+                                }
+                            }
+                        } else if ( gApp.equals(entry.getValue().getApplicationName()) ) {
+                            apps.add(entry.getValue());
+                            break;
+                        } 
+                    } 
+                }
+                groupings.put(group, apps);
+            }
+            bufferedReader.close();
+        } catch (IOException ex) {
+            logger.log(Level.WARNING, "Cannot read " + LicenseS.GROUP_V + " now exiting.");
+            System.exit(0);
+        }
+    }   
     
+    public HashMap<String, ArrayList<ApplicationLicenseCount>> getGroupings() {
+        return groupings;
+    }    
     
     @Override
     public String toString(){

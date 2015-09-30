@@ -5,7 +5,6 @@
 package org.appdynamics.licensecount.file;
 
 import org.appdynamics.appdrestapi.resources.s;
-
 import org.appdynamics.licensecount.resources.LicenseS;
 import org.appdynamics.licensecount.data.NodeLicenseCount;
 import org.appdynamics.licensecount.data.TierHourLicenseRange;
@@ -18,20 +17,22 @@ import org.appdynamics.licensecount.data.ApplicationLicenseCount;
 import org.appdynamics.licensecount.data.CustomerLicenseCount;
 import org.appdynamics.appdrestapi.data.Tier;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map.Entry;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 
-
 import java.util.logging.Logger;
 import java.util.logging.Level;
+
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 
 /**
@@ -40,6 +41,7 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
  */
 public class WriteExcelDoc {
     private static Logger logger=Logger.getLogger(WriteExcelDoc.class.getName());
+    private HashMap<String, ArrayList<ApplicationLicenseCount>> groupings=new HashMap<String, ArrayList<ApplicationLicenseCount>>();
     private CustomerLicenseCount customer;
     private String licensePath;
     private XSSFCellStyle style;
@@ -135,6 +137,31 @@ public class WriteExcelDoc {
             i++;
         }
         
+        //create grouped BU excel sheet
+        if (!LicenseS.GROUP_V.isEmpty()) {
+            XSSFSheet BULicenseSummary = workbook.createSheet(LicenseS.BU_LICENSE_SUMMARY);
+           
+            //parse through file to see if there is key & value
+            customer.aggregateByGroup(customer.getApplications());
+            groupings = customer.getGroupings();
+            
+            Row groupedTierRow = BULicenseSummary.createRow(0);
+
+            Cell cell_4 = groupedTierRow.createCell(0);cell_4.setCellValue(LicenseS.GROUP_NAME);
+            cell_4 = groupedTierRow.createCell(1);cell_4.setCellValue(LicenseS.APPLICATION_NAME);
+            int groupColumnCount = 3;
+            for(CustomerLicenseRange cRange:customer.getCustomerRangeValues()){
+                cell_4=groupedTierRow.createCell(groupColumnCount);cell_4.setCellValue(cRange.getColumnName());
+                groupColumnCount++;
+            }
+            
+            //iterate through all groups for BU summary license file
+            int groupIndex = 1;
+            for(Entry<String, ArrayList<ApplicationLicenseCount>> entry : groupings.entrySet() ) {
+                groupIndex = addGroupInfo(BULicenseSummary, groupIndex, entry);
+            }
+        }
+
         try
         {
             //Write the workbook in file system
@@ -152,7 +179,145 @@ public class WriteExcelDoc {
             e.printStackTrace();
         }
     }
-    
+
+    public int addGroupInfo(XSSFSheet curSheet, int rowIndex, Entry<String, ArrayList<ApplicationLicenseCount>> group) {
+        // This going to add the customer information.
+        int tempRowIndex=rowIndex;
+        int limit = group.getValue().size();
+        int j = 0;
+        int increment;
+        
+        ArrayList<Row> rows=new ArrayList<Row>();
+        
+        if (limit > 6) {
+            increment = limit;
+        } else { increment = 6; }
+        
+        for(int i=rowIndex; i < (rowIndex + increment); i++){
+            rows.add(curSheet.createRow(i));
+        }
+        
+        Cell cell=null;
+        
+        for(int i=0; i <  6 || j < limit ;i++){
+            if ( j < limit ) {
+                cell = rows.get(i).createCell(1);
+                cell.setCellValue(group.getValue().get(j).getApplicationName());
+                j++;
+            } switch(i){
+            
+                case 0:
+                    cell = rows.get(i).createCell(0);
+                    cell.setCellValue(group.getKey());
+                    
+                    cell = rows.get(i).createCell(2);
+                    cell.setCellValue(LicenseS.TOTAL_AGENT_COUNT);
+                    tempRowIndex++;
+                    break;
+                case 1:
+                    cell = rows.get(i).createCell(2);
+                    cell.setCellValue(LicenseS.JAVA_AGENT_COUNT);
+                    tempRowIndex++;
+                    break;
+               
+                case 2:
+                    cell = rows.get(i).createCell(2);
+                    cell.setCellValue(LicenseS.DOTNET_AGENT_COUNT);
+                    tempRowIndex++;
+                    break;
+                    
+                case 3:
+                    cell = rows.get(i).createCell(2);
+                    cell.setCellValue(LicenseS.PHP_AGENT_COUNT);
+                    tempRowIndex++;
+                    break;
+                
+                case 4:
+                    cell = rows.get(i).createCell(2);
+                    cell.setCellValue(LicenseS.NODEJS_AGENT_COUNT);
+                    tempRowIndex++;
+                    break;
+                case 5:
+                    cell = rows.get(i).createCell(2);
+                    cell.setCellValue(LicenseS.MACHINE_AGENT_COUNT);
+                    tempRowIndex++;
+                    break;
+                default:
+                    break;
+            }
+
+        }
+                
+        //just get one app
+        ApplicationLicenseCount appRef = group.getValue().get(0);
+        int columnCount=3;
+
+        //for each date range
+        
+        for (ApplicationLicenseRange cRange: appRef.getAppLicenseRange()) {
+            //for every app in the group
+            double totalCount = 0, javaCount = 0, iisCount = 0, iisInternalCount = 0, phpCount = 0, nodeJsCount = 0, machineCount = 0;
+            for (ApplicationLicenseCount app : group.getValue()) {
+                //for each day
+                for (int i = 0 ; i < 7 ; i++ ) {
+                    if(app.getAppLicenseRange().get(i).getEnd() == cRange.getEnd()) {
+                        totalCount += app.getAppLicenseRange().get(i).getTotalCount();
+                        javaCount += app.getAppLicenseRange().get(i).getJavaCount();
+                        iisCount += app.getAppLicenseRange().get(i).getIisCount();
+                        iisInternalCount += app.getAppLicenseRange().get(i).getIisInternalCount();
+                        phpCount += app.getAppLicenseRange().get(i).getPhpCount();
+                        nodeJsCount += app.getAppLicenseRange().get(i).getNodeJSCount();
+                        machineCount += app.getAppLicenseRange().get(i).getMachineCount();
+                        break;
+                    }
+                }
+            }
+            //now loop down the list to print the values
+            for (int i = 0; i < 6; i++) {
+                switch(i){
+                case 0: //Total Count
+                    cell = rows.get(i).createCell(columnCount);
+                    cell.setCellValue(totalCount);
+                    break;
+                case 1: //Java Agent
+                    cell = rows.get(i).createCell(columnCount);
+                    cell.setCellValue(javaCount);
+                    break;
+
+                case 2: //DotNet Agent
+                    cell = rows.get(i).createCell(columnCount);
+                    //cell.setCellValue(cRange.getIisCount());
+                    cell.setCellValue( new Double(iisCount).intValue() + "(" + new Double (iisInternalCount).intValue() + ")");
+                    cell.setCellStyle(style);
+                    break;
+
+                case 3: //PHP Agent
+                    cell = rows.get(i).createCell(columnCount);
+                    cell.setCellValue(phpCount);
+                    break;
+
+                case 4: //NodeJS Agent
+                    cell = rows.get(i).createCell(columnCount);
+                    
+                    cell.setCellValue(LicenseS.licenseRound(nodeJsCount/10) + "(" + new Double(nodeJsCount).intValue() + ")");
+                    cell.setCellStyle(style);
+                    break;
+                    
+                case 5: //Machine Agent
+                    cell = rows.get(i).createCell(columnCount);
+                    cell.setCellValue(machineCount);
+                    break;
+                    
+                default:
+                    break;
+                }
+            }
+            columnCount++;
+        }
+        if ( j > 6 ) { return tempRowIndex + j - 6 + 2; }
+        return tempRowIndex + 2; 
+    }
+
     public int addCustomer(XSSFSheet curSheet, int rowIndex){
         // This going to add the customer information.
         int tempRowIndex=rowIndex;

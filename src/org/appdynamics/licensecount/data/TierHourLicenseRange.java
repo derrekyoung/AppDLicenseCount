@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.appdynamics.licensecount.data;;
+package org.appdynamics.licensecount.data;
 
 import org.appdynamics.appdrestapi.util.TimeRange;
 import org.appdynamics.appdrestapi.data.MetricValue;

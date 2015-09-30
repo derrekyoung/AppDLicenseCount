@@ -5,7 +5,6 @@
 package org.appdynamics.licensecount.resources;
 
 import org.appdynamics.licensecount.resources.LicenseS;
-
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
@@ -16,8 +15,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.HelpFormatter;
 
+import java.io.File;
 import java.util.ArrayList;
-
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -103,7 +102,12 @@ public class LicenseOptions {
                                 .withDescription( LicenseS.APPS_D )
                                 .create( LicenseS.APPS_S );
         options.addOption(apps);
-        
+ 
+        Option group = OptionBuilder.withLongOpt(LicenseS.GROUP_L).withArgName( LicenseS.GROUP_S )
+                .hasArg()
+                .withDescription( LicenseS.GROUP_D )
+                .create( LicenseS.GROUP_S );
+        options.addOption(group);       
     }
     
     public boolean parse(){
@@ -171,9 +175,16 @@ public class LicenseOptions {
                 
             }
             if(cmdLine.hasOption(LicenseS.APPS_L) || cmdLine.hasOption(LicenseS.APPS_S)){
-                LicenseS.APPS_V=getApps(cmdLine.getOptionValue(LicenseS.APPS_S));
-                
+                LicenseS.APPS_V=getApps(cmdLine.getOptionValue(LicenseS.APPS_S));               
             }
+            if(cmdLine.hasOption(LicenseS.GROUP_L) || cmdLine.hasOption(LicenseS.GROUP_S)){
+                if (!new File(cmdLine.getOptionValue(LicenseS.GROUP_S)).exists()) {
+                    logger.log(Level.WARNING, new StringBuilder().append("File: " + cmdLine.getOptionValue(LicenseS.GROUP_S) + " doesn't exist!").toString() );
+                    return false;
+                }
+                LicenseS.GROUP_V=cmdLine.getOptionValue(LicenseS.GROUP_S);
+                
+            } 
 
 
         }

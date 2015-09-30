@@ -77,7 +77,13 @@ public class LicenseS extends OPTS{
     public static final String USAGE="java -jar AppDynamicsLC.jar";
     public static final String FILE_ENDING="_LicenseCount.xlsx";
     
-    
+    public static final String GROUP_L = "groupfile";
+    public static final String GROUP_S = "g";
+    public static final String GROUP_D = "Path to group reference file";
+    public static final boolean GROUP_R = false;
+    public static final boolean GROUP_A =true;
+    public static String GROUP_V = "";
+
     
     public static String FILENAME_V="Customer1";
     public static int INTERVAL_V=7;
@@ -92,6 +98,8 @@ public class LicenseS extends OPTS{
     public static final String DOTNET_NODE_MAP="DotNet Node Map";
     public static final String WINDOWS_HOST="Windows Host";
     public static final String WINDOWS_MAPPING="Windows Mapping";
+    public static final String BU_LICENSE_SUMMARY = "Business Unit License Summary";
+
     
     public static final String CUSTOMER_NAME="Cutomer Name";
     public static final String APPLICATION_NAME="Application Name";
@@ -101,6 +109,7 @@ public class LicenseS extends OPTS{
     public static final String TIER_TYPE="Tier Type";
     public static final String TIER_AGENT_TYPE="Tier Agent Type";
     public static final String TIER_ID="Tier ID";
+    public static final String GROUP_NAME="Group Name";
   
     
     public static final String TOTAL_AGENT_COUNT="Total Agent Count";
@@ -164,6 +173,7 @@ public class LicenseS extends OPTS{
     public static final String UPTIME="uptime";
     public static final String LOGFILE="logFile";
     public static final String DEBUG_LEVEL="debugLevel";
+    public static final String GROUPFILE="groupFile";
     
     //Base Pages query
     public static final String BASE_PAGES="End User Experience|Base Pages";
