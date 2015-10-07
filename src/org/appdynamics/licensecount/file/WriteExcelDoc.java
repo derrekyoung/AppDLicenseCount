@@ -887,19 +887,25 @@ public class WriteExcelDoc {
             int count=0;
             mainRow = curSheet.createRow(row);
             */
+            
             while(keys.hasNext()){
                 if(count == 0){
+                    row++;
+                   
                     mainRow = curSheet.createRow(row);
                     cell = mainRow.createCell(0);
                     cell.setCellValue(appCount.getApplicationName());
                     row++;
                     count++;
-                    mainRow = curSheet.createRow(row);
+                    
                 }
+                
+                mainRow = curSheet.createRow(row);
                 String key=keys.next();
                 cell = mainRow.createCell(1);
                 cell.setCellValue(key);
                 row++;
+                
                 //We need to iterate again
                 for(String val: appCount.getDotNetMapLog().get(key)){  
                     mainRow = curSheet.createRow(row);
@@ -908,7 +914,10 @@ public class WriteExcelDoc {
                     row++;
                 }
                 row++;
+                
             }
+            
+            if(count > 0){ row++;}
 
         }
         
