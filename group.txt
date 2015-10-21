@@ -1,0 +1,7 @@
+<GroupName>:<App1>,<App2>,<App3>
+
+* Wildcard is supported.  All search strings are case sensitive.
+
+Example:
+ProdApps:Prod_1,PROD_2
+DevApps:*dev,*Dev

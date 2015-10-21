@@ -38,7 +38,7 @@ This will create a directory called execLib with all of the necessary libraries 
 Usage
 --------
 ```
-java -cp "execLib/*" org.appdynamics.licensecount.CountLicenses -c <FQDN-For-Controller> -P <PORT> -u<USER-NAME> -p <PASSWORD> -a <ACCOUNT-NAME> [-s] [-n] [-i] [-A <Apps>] [-d 1|2]
+java -cp "execLib/*" org.appdynamics.licensecount.CountLicenses -c <FQDN-For-Controller> -P <PORT> -u<USER-NAME> -p <PASSWORD> -a <ACCOUNT-NAME> [-s] [-n] [-i] [-A <Apps>] [-d 1|2] [-g<PATH-TO-FILE>]
 
  -a,--account <a>    :   If controller is multi-tenant add the account
 
@@ -63,11 +63,13 @@ java -cp "execLib/*" org.appdynamics.licensecount.CountLicenses -c <FQDN-For-Con
  -U,--uptime <U>     :   Optional : The amount of uptime necessary for an agent to be up so that it is counted. Default value is .70 (70%) 
 
  -d,--debug <d>      :   Debug level to set the calls at.
+
+ -g, --group <g>     :   Optional : This is going to create an additional worksheet labeled "Business Unit License Summary" at the end of the excel sheet with license count separated as specified in text file.  See "group.txt” for example text file format. 
 ```
 
 Example:
 
-java -Xmx512m -cp "execLib/*" org.appdynamics.licensecount.CountLicenses -cACME-CONTROLLER.saas.appdynamics.com -P443 -uACMEUSERNAME -pACMEPASSWORD -aACME -s 
+java -Xmx512m -cp "execLib/*" org.appdynamics.licensecount.CountLicenses -cACME-CONTROLLER.saas.appdynamics.com -P443 -uACMEUSERNAME -pACMEPASSWORD -aACME -s -g/my/path/to/group.txt
 
 Support:
 --------
