@@ -22,7 +22,7 @@ public class LicenseS extends OPTS{
     public static final boolean VERSION_R=false;
     public static final boolean VERSION_A=false;
     public static final String VERSION_D="Prints out the version of the tool";
-    public static final String VERSION_V="1.1.1";
+    public static final String VERSION_V="1.0.4";
     
     public static final String FILENAME_L="file";
     public static final String FILENAME_S="f";
