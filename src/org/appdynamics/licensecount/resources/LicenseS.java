@@ -117,6 +117,7 @@ public class LicenseS extends OPTS{
     public static final String DOTNET_AGENT_COUNT="DotNet Agent Count";
     public static final String PHP_AGENT_COUNT="PHP Agent Count";
     public static final String NODEJS_AGENT_COUNT="NodeJS Agent Count";
+    public static final String WEBSERVER_AGENT_COUNT="WebServer Agent Count";
     public static final String MACHINE_AGENT_COUNT="Machine Agent Count";
     public static final String APPLICATION_AGENT_COUNT="Application Agent Count";
     

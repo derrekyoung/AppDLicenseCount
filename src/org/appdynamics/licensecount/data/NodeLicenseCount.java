@@ -119,6 +119,7 @@ public class NodeLicenseCount extends LicenseCount{
         this.totalRangeValue = totalRangeValue;
     }
     
+    /*
     public void populateNodeLicenseRange(TimeRange totalTimeRange, ArrayList<TimeRange> timeRanges, RESTAccess access, 
             String applicationName, String tierAgentType){
         
@@ -138,9 +139,11 @@ public class NodeLicenseCount extends LicenseCount{
                 count++;
                 if( checkIfNotJava(access, applicationName, tRange.getStart(), tRange.getEnd()) ){ 
                     if(s.debugLevel >= 2) 
-                            logger.log(Level.INFO,new StringBuilder().append("\n\tIt is not java").toString());
+                            logger.log(Level.INFO,new StringBuilder().append("\n\n\t\tIt is not java, agent type: ").append(tierAgentType).toString());
                     boolean fnd=false;
-                    if(checkIfPHP(tierAgentType)){ type=2;fnd=true;}
+                    if(checkIfWebServer(tierAgentType)){type=6;fnd=true;}
+                    if(!fnd && checkIfPHP(tierAgentType)){ type=2;fnd=true;}
+                    
                     if(!fnd && checkIfNodeJs(tierAgentType)){ type=3;fnd=true;}
                     if(!fnd && checkIfDotNet(tierAgentType)){type=1;fnd=true;}
                     if(!fnd)type=2;
@@ -158,7 +161,7 @@ public class NodeLicenseCount extends LicenseCount{
         }
         
     }
-    
+    */
     /*
      *  This is where we are going to actually execute the count, for Java this is simple
      * but for .Net and Php we need to something different.
@@ -188,12 +191,24 @@ public class NodeLicenseCount extends LicenseCount{
         /*
          * So when the metric exists but is not populated then you get the 
          */
-        if(s.debugLevel >= 2) 
-            logger.log(Level.INFO,new StringBuilder().append("\t\tNode ").append(node.getName()).append(" is being check to see if its php, with tiername ").append(node.getTierName()).toString());
+       // if(s.debugLevel >= 2) 
+          //  logger.log(Level.INFO,new StringBuilder().append("\t\tNode ").append(node.getName()).append(" is being check to see if its php, with tiername ").append(node.getTierName()).toString());
+        
         MetricDatas mds = access.getRESTMetricQuery(25, app, node.getTierName(), node.getName(), start, end);
+        
+        if(s.debugLevel >= 2 ) 
+            logger.log(Level.INFO,new StringBuilder().append("\t\tNode ").append(node.getName())
+                    .append(" is being check to see if its php, with tiername ").append(node.getTierName()).toString());
         
         if(mds != null && mds.getMetric_data() != null && mds.getMetric_data().size() == 0) return true;
         
+        
+        return false;
+    }
+    
+    public boolean checkIfWebServer(String tierAgentType){
+        //logger.log(Level.INFO,new StringBuilder().append("\n\n\t\tCheck for Php ").append(tierAgentType).toString());
+        if(tierAgentType.matches("(?i).*WEB_SERVER.*")) return true;
         return false;
     }
     

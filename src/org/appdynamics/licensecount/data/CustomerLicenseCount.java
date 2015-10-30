@@ -101,12 +101,15 @@ public class CustomerLicenseCount extends LicenseCount{
                 aRange.phpCount+=tRange.getPhpCount();
                 aRange.totalCount+=tRange.getTotalCount();
                 aRange.iisInternalCount+=tRange.getIisInternalCount();
+                aRange.webserverCount+=tRange.getWebserverCount();
                 
             }
             //logger.log(Level.INFO, "Value of iisCount " + aRange.iisCount);
             // We need to round the license up.
             aRange.iisCount=licenseRound(aRange.iisCount);
             aRange.totalCount=licenseRound(aRange.totalCount);
+            if(aRange.nodeJSCount > 0)
+                aRange.totalCount=licenseRound(aRange.iisCount)+licenseRound(aRange.getNodeJSCount()/10)+aRange.phpCount+aRange.getJavaCount()+aRange.getMachineCount()+aRange.getWebserverCount();
             customerRangeValues.add(aRange);
         }
         
@@ -118,6 +121,7 @@ public class CustomerLicenseCount extends LicenseCount{
             totalRangeValue.machineCount+=tRange.machineCount;
             totalRangeValue.totalCount+=tRange.totalCount;
             totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
+            totalRangeValue.webserverCount+=tRange.webserverCount;
         }
         
         

@@ -218,9 +218,8 @@ public class TierLicenseCount extends LicenseCount{
                             bud.append(" and iisInternalCount orig value ").append(tRange.iisInternalCount);
                             tRange.iisInternalCount++;
                             bud.append("\n\tiisCount new value ").append(tRange.iisCount).append(" and iisInternalCount new value ").append(tRange.iisInternalCount);
-                            //logger.log(Level.INFO,bud.toString());
-                            //tRange.iisCount+=node.getLicWeight();
-                            //tRange.totalCount+=node.getLicWeight();
+
+                            
                             break;
                         case 2:
                             //We don't do anything for now, this will be added up later
@@ -237,6 +236,9 @@ public class TierLicenseCount extends LicenseCount{
                             tRange.machineCount++;
                             tRange.totalCount++;
                             break;
+                        case 6:
+                            tRange.webserverCount++;
+                            tRange.totalCount++;
                         default:
                             tRange.javaCount++;
                             tRange.totalCount++;
@@ -256,6 +258,7 @@ public class TierLicenseCount extends LicenseCount{
             totalRangeValue.machineCount+=tRange.machineCount;
             totalRangeValue.totalCount+=tRange.totalCount;
             totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
+            totalRangeValue.webserverCount+=tRange.webserverCount;
         }
     }
     

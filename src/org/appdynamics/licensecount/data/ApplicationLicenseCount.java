@@ -132,9 +132,12 @@ public class ApplicationLicenseCount extends LicenseCount{
                 aRange.phpCount+=tRange.getPhpCount();
                 aRange.totalCount+=tRange.getTotalCount();
                 aRange.iisInternalCount+=tRange.iisInternalCount;
+                aRange.webserverCount+=tRange.webserverCount;
+                // This will insure that nodejs is properly counted.
                 
             }
-            
+            if(aRange.getNodeJSCount() > 0)  
+                    aRange.totalCount= (aRange.getTotalCount() - aRange.getNodeJSCount()) + licenseRound(aRange.getNodeJSCount()/10);
             appLicenseRange.add(aRange);
         }
         
@@ -162,6 +165,7 @@ public class ApplicationLicenseCount extends LicenseCount{
             totalRangeValue.machineCount+=tRange.machineCount;
             totalRangeValue.totalCount+=tRange.totalCount;
             totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
+            totalRangeValue.webserverCount+=tRange.webserverCount;
         }
         
     }

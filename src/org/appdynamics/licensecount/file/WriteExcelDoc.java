@@ -199,7 +199,7 @@ public class WriteExcelDoc {
         
         Cell cell=null;
         
-        for(int i=0; i <  6 || j < limit ;i++){
+        for(int i=0; i <  7 || j < limit ;i++){
             if ( j < limit ) {
                 cell = rows.get(i).createCell(1);
                 cell.setCellValue(group.getValue().get(j).getApplicationName());
@@ -237,7 +237,14 @@ public class WriteExcelDoc {
                     cell.setCellValue(LicenseS.NODEJS_AGENT_COUNT);
                     tempRowIndex++;
                     break;
+                    
                 case 5:
+                    cell = rows.get(i).createCell(2);
+                    cell.setCellValue(LicenseS.WEBSERVER_AGENT_COUNT);
+                    tempRowIndex++;
+                    break;
+                    
+                case 6:
                     cell = rows.get(i).createCell(2);
                     cell.setCellValue(LicenseS.MACHINE_AGENT_COUNT);
                     tempRowIndex++;
@@ -256,10 +263,11 @@ public class WriteExcelDoc {
         
         for (ApplicationLicenseRange cRange: appRef.getAppLicenseRange()) {
             //for every app in the group
-            double totalCount = 0, javaCount = 0, iisCount = 0, iisInternalCount = 0, phpCount = 0, nodeJsCount = 0, machineCount = 0;
+            double totalCount = 0, javaCount = 0, iisCount = 0, iisInternalCount = 0, phpCount = 0, nodeJsCount = 0, machineCount = 0, webserverCount=0;
+            
             for (ApplicationLicenseCount app : group.getValue()) {
                 //for each day
-                for (int i = 0 ; i < 7 ; i++ ) {
+                for (int i = 0 ; i <  7; i++ ) {
                     if(app.getAppLicenseRange().get(i).getEnd() == cRange.getEnd()) {
                         totalCount += app.getAppLicenseRange().get(i).getTotalCount();
                         javaCount += app.getAppLicenseRange().get(i).getJavaCount();
@@ -268,12 +276,13 @@ public class WriteExcelDoc {
                         phpCount += app.getAppLicenseRange().get(i).getPhpCount();
                         nodeJsCount += app.getAppLicenseRange().get(i).getNodeJSCount();
                         machineCount += app.getAppLicenseRange().get(i).getMachineCount();
+                        webserverCount += app.getAppLicenseRange().get(i).getWebserverCount();
                         break;
                     }
                 }
             }
             //now loop down the list to print the values
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < 7; i++) {
                 switch(i){
                 case 0: //Total Count
                     cell = rows.get(i).createCell(columnCount);
@@ -303,7 +312,12 @@ public class WriteExcelDoc {
                     cell.setCellStyle(style);
                     break;
                     
-                case 5: //Machine Agent
+                case 5:
+                    cell = rows.get(i).createCell(columnCount);
+                    cell.setCellValue(webserverCount);
+                    break;
+                    
+                case 6: //Machine Agent
                     cell = rows.get(i).createCell(columnCount);
                     cell.setCellValue(machineCount);
                     break;
@@ -322,12 +336,12 @@ public class WriteExcelDoc {
         // This going to add the customer information.
         int tempRowIndex=rowIndex;
         ArrayList<Row> rows=new ArrayList<Row>();
-        for(int i=rowIndex; i < (rowIndex + 6); i++){
+        for(int i=rowIndex; i < (rowIndex + 7); i++){
             rows.add(curSheet.createRow(i));
         }
         
         Cell cell=null;
-        for(int i=0; i <  6;i++){
+        for(int i=0; i <  7;i++){
             switch(i){
                 case 0:
                     cell = rows.get(i).createCell(0);
@@ -361,6 +375,12 @@ public class WriteExcelDoc {
                     break;
                 case 5:
                     cell = rows.get(i).createCell(1);
+                    cell.setCellValue(LicenseS.WEBSERVER_AGENT_COUNT);
+                    tempRowIndex++;        
+                    break;
+                    
+                case 6:
+                    cell = rows.get(i).createCell(1);
                     cell.setCellValue(LicenseS.MACHINE_AGENT_COUNT);
                     tempRowIndex++;
                     break;
@@ -373,7 +393,7 @@ public class WriteExcelDoc {
         int columnCount=2;
         for(CustomerLicenseRange cRange:customer.getCustomerRangeValues()){
             
-            for(int i=0; i < 6;i++){
+            for(int i=0; i < 7;i++){
                 switch(i){
                     case 0: //Total Count
                         cell = rows.get(i).createCell(columnCount);
@@ -403,7 +423,12 @@ public class WriteExcelDoc {
                         cell.setCellStyle(style);
                         break;
                         
-                    case 5: //Machine Agent
+                    case 5: 
+                        cell = rows.get(i).createCell(columnCount);
+                        cell.setCellValue(cRange.getWebserverCount());
+                        break;
+                        
+                    case 6://Machine Agent
                         cell = rows.get(i).createCell(columnCount);
                         cell.setCellValue(cRange.getMachineCount());
                         break;
@@ -421,12 +446,12 @@ public class WriteExcelDoc {
         // This going to add the customer information.
         int tempRowIndex=rowIndex;
         ArrayList<Row> rows=new ArrayList<Row>();
-        for(int i=rowIndex; i < (rowIndex + 6); i++){
+        for(int i=rowIndex; i < (rowIndex + 7); i++){
             rows.add(curSheet.createRow(i));
         }
         
         Cell cell=null;
-        for(int i=0; i <  6;i++){
+        for(int i=0; i <  7;i++){
             switch(i){
                 case 0:
                     cell = rows.get(i).createCell(0);
@@ -458,7 +483,14 @@ public class WriteExcelDoc {
                     cell.setCellValue(LicenseS.NODEJS_AGENT_COUNT);
                     tempRowIndex++;
                     break;
+                    
                 case 5:
+                    cell = rows.get(i).createCell(1);
+                    cell.setCellValue(LicenseS.WEBSERVER_AGENT_COUNT);
+                    tempRowIndex++;
+                    break;
+                    
+                case 6:
                     cell = rows.get(i).createCell(1);
                     cell.setCellValue(LicenseS.MACHINE_AGENT_COUNT);
                     tempRowIndex++;
@@ -472,7 +504,7 @@ public class WriteExcelDoc {
         int columnCount=2;
         for(ApplicationLicenseRange cRange:appLicenseCount.getAppLicenseRange()){
             
-            for(int i=0; i < 6;i++){
+            for(int i=0; i < 7;i++){
                 switch(i){
                     case 0: //Total Count
                         cell = rows.get(i).createCell(columnCount);
@@ -506,7 +538,12 @@ public class WriteExcelDoc {
      
                         break;
                         
-                    case 5: //Machine Agent
+                    case 5: //WebServer
+                        cell = rows.get(i).createCell(columnCount);
+                        cell.setCellValue(cRange.getWebserverCount());
+                        break;
+                        
+                    case 6: //MachineAgent
                         cell = rows.get(i).createCell(columnCount);
                         cell.setCellValue(cRange.getMachineCount());
    
@@ -525,12 +562,12 @@ public class WriteExcelDoc {
         // This going to add the customer information.
         int tempRowIndex=rowIndex;
         ArrayList<Row> rows=new ArrayList<Row>();
-        for(int i=rowIndex; i < (rowIndex + 6); i++){
+        for(int i=rowIndex; i < (rowIndex + 7); i++){
             rows.add(curSheet.createRow(i));
         }
         
         Cell cell=null;
-        for(int i=0; i <  6;i++){
+        for(int i=0; i <  7;i++){
             switch(i){
                 case 0:
                     if(inCount == 0){
@@ -566,7 +603,14 @@ public class WriteExcelDoc {
                     cell.setCellValue(LicenseS.NODEJS_AGENT_COUNT);
                     tempRowIndex++;
                     break;
+                    
                 case 5:
+                    cell = rows.get(i).createCell(2);
+                    cell.setCellValue(LicenseS.WEBSERVER_AGENT_COUNT);
+                    tempRowIndex++;
+                    break;
+                    
+                case 6:
                     cell = rows.get(i).createCell(2);
                     cell.setCellValue(LicenseS.MACHINE_AGENT_COUNT);
                     tempRowIndex++;
@@ -580,7 +624,7 @@ public class WriteExcelDoc {
         int columnCount=3;
         for(TierLicenseRange cRange:tLicenseCount.getTierLicenseRange()){
             
-            for(int i=0; i < 6;i++){
+            for(int i=0; i < 7;i++){
                 switch(i){
                     case 0: //Total Count
                         cell = rows.get(i).createCell(columnCount);
@@ -613,7 +657,12 @@ public class WriteExcelDoc {
      
                         break;
                         
-                    case 5: //Machine Agent
+                    case 5: //WebServer Agent
+                        cell = rows.get(i).createCell(columnCount);
+                        cell.setCellValue(cRange.getWebserverCount());
+                        break;
+                        
+                    case 6: //Machine Agent
                         cell = rows.get(i).createCell(columnCount);
                         cell.setCellValue(cRange.getMachineCount());
    
@@ -783,7 +832,7 @@ public class WriteExcelDoc {
                     cell = mainRow.createCell(1);
                     cell.setCellValue(tierCount.getName());
                     cell = mainRow.createCell(2);
-                    cell.setCellValue(nodeCount.getName());
+                    cell.setCellValue(new StringBuilder().append(nodeCount.getName()).append("(").append(nodeCount.getMachineName()).append(")").toString());
                     // This is when we pick the agent type
                     cell = mainRow.createCell(3);
                     if(nodeCount.getNode().isAppAgentPresent()){

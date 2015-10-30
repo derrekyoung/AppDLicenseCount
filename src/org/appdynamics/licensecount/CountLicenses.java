@@ -134,7 +134,7 @@ public class CountLicenses {
         }
         
         //If we don't find anything, then exit
-        if(customer.getApplications().size() == 0){
+        if(customer.getApplications().isEmpty()){
             logger.log(Level.WARNING,new StringBuilder().append("No applications were found, exiting").toString());
             System.exit(0);
         } 

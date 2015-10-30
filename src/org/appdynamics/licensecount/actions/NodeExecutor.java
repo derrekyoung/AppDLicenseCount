@@ -67,11 +67,12 @@ public class NodeExecutor implements Runnable{
  
                 if( nodeLic.checkIfNotJava(access, appName, timeRanges.get(0).getStart(), timeRanges.get(0).getEnd()) ){ 
                     if(s.debugLevel >= 2) 
-                            logger.log(Level.INFO,new StringBuilder().append("\n\tIt is not java").toString());
+                            logger.log(Level.INFO,new StringBuilder().append("\n\tIt is not java, agent type is ").append(tierAgentType).toString());
                     boolean fnd=false;
-                    if(nodeLic.checkIfPHP(tierAgentType)){ nodeLic.setType(2);fnd=true;}
-                    if(nodeLic.checkIfNodeJs(tierAgentType)){ nodeLic.setType(3);fnd=true;}
-                    if(nodeLic.checkIfDotNet(tierAgentType)){nodeLic.setType(1);fnd=true;}
+                    if(nodeLic.checkIfWebServer(tierAgentType)){nodeLic.setType(6);fnd=true;}
+                    if(!fnd && nodeLic.checkIfPHP(tierAgentType)){ nodeLic.setType(2);fnd=true;}
+                    if(!fnd && nodeLic.checkIfNodeJs(tierAgentType)){ nodeLic.setType(3);fnd=true;}
+                    if(!fnd && nodeLic.checkIfDotNet(tierAgentType)){nodeLic.setType(1);fnd=true;}
                     if(!fnd)nodeLic.setType(2);
                 }else{
                     nodeLic.setType(0);

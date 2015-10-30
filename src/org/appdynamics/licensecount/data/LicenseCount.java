@@ -25,6 +25,7 @@ public class LicenseCount {
     protected double machine=0;
     protected double iis=0;
     protected double nodeJS=0;
+    protected double webServer=0;
     protected TimeRange range;
     
     public LicenseCount(){}
@@ -61,6 +62,14 @@ public class LicenseCount {
         this.nodeJS = nodeJS;
     }
 
+    public double getWebServer() {
+        return webServer;
+    }
+
+    public void setWebServer(double webServer) {
+        this.webServer = webServer;
+    }
+    
     public TimeRange getRange() {  return range;  }
 
     public void setRange(TimeRange range) {
@@ -68,7 +77,7 @@ public class LicenseCount {
     }
 
     
-    //Agent types: 0:Java, 1:IIS, 2:PHP, 3:NodeJS, 4 Machine Agent
+    //Agent types: 0:Java, 1:IIS, 2:PHP, 3:NodeJS, 4 Machine Agent, 5 Unknown, 6 Web Server
     public String getAgentName(int agentId){
         String val = s.AGENT_NAME_JAVA;
         switch(agentId){
@@ -87,11 +96,14 @@ public class LicenseCount {
             case 5:
                 val=LicenseS.AGENT_NAME_OTHER_AGENT;
                 break;
+            case 6:
+                val=s.AGENT_NAME_WEB_SERVER;
             default:
                 break;
         }
         return val;
     }
+
     
     public MetricValues getMetricValues(MetricDatas mDatas){
         if(mDatas != null && mDatas.getMetric_data().size() > 0){
@@ -219,7 +231,7 @@ public class LicenseCount {
     }
     
     public static int licenseRound(double licenseC){
-        String numString = new Double(licenseC).toString();
+        String numString = Double.toString(licenseC);
         if(numString.contains(".")){
             String decimalValue = numString.split("\\.")[1];
             String integerValue = numString.split("\\.")[0];

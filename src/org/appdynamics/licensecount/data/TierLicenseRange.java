@@ -13,7 +13,7 @@ import org.appdynamics.licensecount.resources.LicenseS;
  */
 public class TierLicenseRange extends TimeRange{
     protected double javaCount, phpCount, iisCount, iisInternalCount, nodeJSCount, machineCount, 
-            totalCount, tierAppAgentCount, tierMachineAgentCount;
+            totalCount, tierAppAgentCount, tierMachineAgentCount, webserverCount;
 
     public TierLicenseRange(){super();}
 
@@ -46,6 +46,16 @@ public class TierLicenseRange extends TimeRange{
     public double getNodeJSCount() {
         return nodeJSCount;
     }
+
+    public double getWebserverCount() {
+        return webserverCount;
+    }
+
+    public void setWebserverCount(double webserverCount) {
+        this.webserverCount = webserverCount;
+    }
+    
+    
     
     public String getNodeJSCount_C(){
         double val1 = nodeJSCount/10;
