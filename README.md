@@ -17,7 +17,7 @@ share a base directory, this will make the dependency checking easier. Compile a
 package the AppDRESTAPI-SDK to insure files that are needed are present. Once this 
 package has been cloned edit the file called ‘one_time_git.properties’, insure the 
 location of AppDRESTAPI-SDK and the version of the jar file are correct. The file 
-‘one_time_git.properties’ should not be synced with the git repository after it has 
+‘one_time_git.properties’ should not be sync'd with the git repository after it has 
 been edited because the settings only apply to your environment.
 
 The file contains two variables please insure that they are correct (insure that no 
