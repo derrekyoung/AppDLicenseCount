@@ -59,10 +59,17 @@ public class LicenseS extends OPTS{
     //
     public static final String NOW_L="now";
     public static final String NOW_S="n";
-    public static final String NOW_D="Include current agent count";
+    public static final String NOW_D="Include upto the last full hour for the agent count";
     public static final boolean NOW_R=false;
     public static final boolean NOW_A=false;
     public static boolean NOW_V=false;
+    
+    public static final String NODE_L="node";
+    public static final String NODE_S="N";
+    public static final String NODE_D="Provide an additional sheet with a node hourly breakdown";
+    public static final boolean NODE_R=false;
+    public static final boolean NODE_A=false;
+    public static boolean NODE_V=false;
     
     //Log File
     
@@ -93,6 +100,7 @@ public class LicenseS extends OPTS{
     public static final String LICENSE_SUMMARY="License Summary";
     public static final String TIER_SUMMARY="Tier Summary";
     public static final String HOURLY_TIER_SUMMARY="Hourly Tier Summary";
+    public static final String HOURLY_NODE_SUMMARY="Hourly Node Summary";
     public static final String NODE_INFO_SUMMARY="Node Info Summary";
     public static final String TIERS_WITH_NO_NODES="Tiers With No Nodes";
     public static final String DOTNET_NODE_MAP="DotNet Node Map";

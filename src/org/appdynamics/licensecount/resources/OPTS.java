@@ -52,7 +52,7 @@ public class OPTS {
     public static final boolean DEBUG_R=false;
     
     public static final String GRANULAR_L="granular";
-    public static final String GRANULAR_S="g";
+    public static final String GRANULAR_S="G";
     public static final String GRANULAR_D="How granular you want the text.";
     public static final boolean GRANULAR_A=false;
     public static final boolean GRANULAR_R=false;

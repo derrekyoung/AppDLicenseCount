@@ -6,15 +6,7 @@ package org.appdynamics.licensecount.file;
 
 import org.appdynamics.appdrestapi.resources.s;
 import org.appdynamics.licensecount.resources.LicenseS;
-import org.appdynamics.licensecount.data.NodeLicenseCount;
-import org.appdynamics.licensecount.data.TierHourLicenseRange;
-import org.appdynamics.licensecount.data.TierLicenseRange;
-import org.appdynamics.licensecount.data.ApplicationLicenseRange;
-import org.appdynamics.licensecount.data.AppHourLicenseRange;
-import org.appdynamics.licensecount.data.CustomerLicenseRange;
-import org.appdynamics.licensecount.data.TierLicenseCount;
-import org.appdynamics.licensecount.data.ApplicationLicenseCount;
-import org.appdynamics.licensecount.data.CustomerLicenseCount;
+import org.appdynamics.licensecount.data.*;
 import org.appdynamics.appdrestapi.data.Tier;
 
 import java.io.File;
@@ -57,12 +49,16 @@ public class WriteExcelDoc {
         XSSFSheet licenseSummary = workbook.createSheet(LicenseS.LICENSE_SUMMARY);
         XSSFSheet licenseTiers = workbook.createSheet(LicenseS.TIER_SUMMARY);
         XSSFSheet licenseHourlyTiers = workbook.createSheet(LicenseS.HOURLY_TIER_SUMMARY);
+        XSSFSheet licensedHourlyNodes=null;
+        if(LicenseS.NODE_V) licensedHourlyNodes=workbook.createSheet(LicenseS.HOURLY_NODE_SUMMARY);
         XSSFSheet licenseNodeInfo = workbook.createSheet(LicenseS.NODE_INFO_SUMMARY);
         XSSFSheet licenseNoNodeTiers = workbook.createSheet(LicenseS.TIERS_WITH_NO_NODES);
         XSSFSheet licenseDotNetNodeMap = workbook.createSheet(LicenseS.DOTNET_NODE_MAP);
         
         style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.RIGHT);
+        
+        /**  Here we are going to add the   **/
         addNodeInfo(licenseNodeInfo);
         addTierWNoNodeInfo(licenseNoNodeTiers);
         addDotNetMap(licenseDotNetNodeMap);
@@ -81,7 +77,13 @@ public class WriteExcelDoc {
         Cell cell_3 = hourlyTierRow.createCell(i);cell_3.setCellValue(LicenseS.APPLICATION_NAME);
         cell_3 = hourlyTierRow.createCell(i+1);cell_3.setCellValue(LicenseS.TIER_NAME);
         
-
+        Cell cell_4=null;
+         if(LicenseS.NODE_V) {
+             Row hourlyNodeRow = licensedHourlyNodes.createRow(headerRowIndex);
+             cell_4 = hourlyNodeRow.createCell(i);cell_4.setCellValue(LicenseS.APPLICATION_NAME);
+             cell_4 = hourlyNodeRow.createCell(i + 1);cell_4.setCellValue(LicenseS.TIER_NAME);
+             cell_4 = hourlyNodeRow.createCell(i + 2);cell_4.setCellValue(LicenseS.NODE_NAME);
+                     }
         i+=2;
         
         int columnCount=2;
@@ -101,7 +103,9 @@ public class WriteExcelDoc {
         cell_1 = headerRow.createCell(0);cell_1.setCellValue(LicenseS.APPLICATION_NAME);
         i++;
         int tierRowCount=2;
+        int nodeRowCount=2;
         int createdHourlyTierHeader=0;
+        int createdHourlyNodeHeader=0;
         columnCount1=3;
         
         //logger.log(Level.INFO,new StringBuilder().append("\n\n\tNumber of applications ").append(customer.getApplications().size()).toString());
@@ -147,7 +151,7 @@ public class WriteExcelDoc {
             
             Row groupedTierRow = BULicenseSummary.createRow(0);
 
-            Cell cell_4 = groupedTierRow.createCell(0);cell_4.setCellValue(LicenseS.GROUP_NAME);
+            cell_4 = groupedTierRow.createCell(0);cell_4.setCellValue(LicenseS.GROUP_NAME);
             cell_4 = groupedTierRow.createCell(1);cell_4.setCellValue(LicenseS.APPLICATION_NAME);
             int groupColumnCount = 3;
             for(CustomerLicenseRange cRange:customer.getCustomerRangeValues()){

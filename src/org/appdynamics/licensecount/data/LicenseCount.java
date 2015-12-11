@@ -154,7 +154,7 @@ public class LicenseCount {
         //This should provide the current data
         if(LicenseS.NOW_V){
             Calendar calNow = Calendar.getInstance();
-            calNow.set(Calendar.SECOND,0);calNow.set(Calendar.MINUTE, 0);calNow.set(Calendar.MILLISECOND,0);
+            calNow.set(Calendar.SECOND,0);calNow.set(Calendar.MILLISECOND,0); calNow.set(Calendar.MINUTE, 0); 
             Calendar calHalf = Calendar.getInstance();calHalf.setTimeInMillis(calNow.getTimeInMillis());
             calHalf.set(Calendar.HOUR_OF_DAY, 0);
             

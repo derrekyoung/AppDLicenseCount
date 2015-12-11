@@ -78,6 +78,8 @@ public class CountLicenses {
     
     private static void init(){
         long start=Calendar.getInstance().getTimeInMillis();
+        
+        if(s.debugLevel > 0) {
         StringBuilder bud = new StringBuilder();
         bud.append("\nRunning license count with the following options:");
         bud.append("\n\tController: ").append(LicenseS.CONTROLLER_V);
@@ -93,7 +95,8 @@ public class CountLicenses {
         bud.append("\n\tDebug Level: ").append(LicenseS.DEBUG_V).append("\n");
         //
         
-        if(s.debugLevel > 0) logger.log(Level.INFO,bud.toString());
+        logger.log(Level.INFO,bud.toString());
+        }
         
         
         /*
@@ -133,7 +136,7 @@ public class CountLicenses {
             }
         }
         
-        //If we don't find anything, then exit
+        //If we didn't find anything, then exit
         if(customer.getApplications().isEmpty()){
             logger.log(Level.WARNING,new StringBuilder().append("No applications were found, exiting").toString());
             System.exit(0);

@@ -11,7 +11,8 @@ can be compared of the hours of the days.
 Requirements:
 -------------------
 The AppDLicenseCount solution is dependent on the AppDRESTAPI-SDK 
-               (https://github.com/Appdynamics/AppDRESTAPI-SDK.git) this should be 
+               (https://github.com/Appdynamics/AppDRESTAPI-SDK.git) 
+version 2.4.0 or above is need for the current version, this should be 
 cloned and built before cloning this package. It is recommended that both packages 
 share a base directory, this will make the dependency checking easier. Compile and 
 package the AppDRESTAPI-SDK to insure files that are needed are present. Once this 
@@ -58,13 +59,17 @@ java -cp "execLib/*" org.appdynamics.licensecount.CountLicenses -c <FQDN-For-Con
 
  -A,--apps           :   Optional : Comma separated list of Application names with no extra spaces that should be included in the report.
 
- -g,--granular       :   How granular you want the text.
+ -G,--granular       :   How granular you want the text.
+
+ -n, --now               :   Include upto the last full hour in the count
 
  -U,--uptime <U>     :   Optional : The amount of uptime necessary for an agent to be up so that it is counted. Default value is .70 (70%) 
 
  -d,--debug <d>      :   Debug level to set the calls at.
 
  -g, --group <g>     :   Optional : This is going to create an additional worksheet labeled "Business Unit License Summary" at the end of the excel sheet with license count separated as specified in text file.  See "group.txt” for example text file format. 
+
+ -N, --nodes <N>     :   Optional : This will produce an additional sheet with hourly node brake down.
 ```
 
 Example:
