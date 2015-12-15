@@ -58,10 +58,14 @@ public class NodeLicenseCount extends LicenseCount{
             type=4;
             queryType=1;
         }else{
-            type=getAgentTypeFromVersion(node.getAppAgentVersion(),node.getType());
+            if(node.getAgentType() != null && !node.getAgentType().equalsIgnoreCase("")){
+                type=getAgentTypeFromVersion(node.getAppAgentVersion(),node.getType(),node.getAgentType());
+            }else{
+                type=getAgentTypeFromVersion(node.getAppAgentVersion(),node.getType());
+            }
         }
         if(s.debugLevel >= 2) 
-            logger.log(Level.INFO,new StringBuilder().append("\t\tNode ").append(node.getName()).append(" type is ").append(type).toString());
+            logger.log(Level.INFO,new StringBuilder().append("\t\tNode ").append(node.getName()).append(" type ID is  ").append(type).append(", type name is ").append(node.getType()).toString());
         
     }
 
@@ -119,49 +123,7 @@ public class NodeLicenseCount extends LicenseCount{
         this.totalRangeValue = totalRangeValue;
     }
     
-    /*
-    public void populateNodeLicenseRange(TimeRange totalTimeRange, ArrayList<TimeRange> timeRanges, RESTAccess access, 
-            String applicationName, String tierAgentType){
-        
-        MetricDatas mDatas= 
-                access.getRESTMetricQuery(getQueryType(), applicationName, node.getTierName(), node.getName(), 
-                totalTimeRange.getStart(), totalTimeRange.getEnd());
-        //What happens when this is null ?
-        totalRangeValue=new NodeLicenseRange("Total Node Count");
-        totalRangeValue.setStart(totalTimeRange.getStart());
-        totalRangeValue.setEnd(totalTimeRange.getEnd());
-        totalRangeValue.setMetricValues(getMetricValues(mDatas));
-        
-        int count=0;
-        for(TimeRange tRange:timeRanges){
-            
-            if(type == 5 && count == 0){
-                count++;
-                if( checkIfNotJava(access, applicationName, tRange.getStart(), tRange.getEnd()) ){ 
-                    if(s.debugLevel >= 2) 
-                            logger.log(Level.INFO,new StringBuilder().append("\n\n\t\tIt is not java, agent type: ").append(tierAgentType).toString());
-                    boolean fnd=false;
-                    if(checkIfWebServer(tierAgentType)){type=6;fnd=true;}
-                    if(!fnd && checkIfPHP(tierAgentType)){ type=2;fnd=true;}
-                    
-                    if(!fnd && checkIfNodeJs(tierAgentType)){ type=3;fnd=true;}
-                    if(!fnd && checkIfDotNet(tierAgentType)){type=1;fnd=true;}
-                    if(!fnd)type=2;
-                }else{
-                    type = 0;
-                }
-            }
-            NodeLicenseRange nodeR = new NodeLicenseRange();
-            nodeR.setStart(tRange.getStart());nodeR.setEnd(tRange.getEnd());
-            nodeR.setName(nodeR.createName());
-            for(MetricValue val: totalRangeValue.getMetricValues().getMetricValue()){
-                if(nodeR.withIn(val.getStartTimeInMillis())) nodeR.getMetricValues().getMetricValue().add(val);
-            }
-            rangeValues.add(nodeR);
-        }
-        
-    }
-    */
+
     /*
      *  This is where we are going to actually execute the count, for Java this is simple
      * but for .Net and Php we need to something different.

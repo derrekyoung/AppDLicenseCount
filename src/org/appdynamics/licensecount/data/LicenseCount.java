@@ -26,6 +26,7 @@ public class LicenseCount {
     protected double iis=0;
     protected double nodeJS=0;
     protected double webServer=0;
+    protected double nativeSDK=0;
     protected TimeRange range;
     
     public LicenseCount(){}
@@ -62,6 +63,14 @@ public class LicenseCount {
         this.nodeJS = nodeJS;
     }
 
+    public double getNativeSDK() {
+        return nativeSDK;
+    }
+
+    public void setNativeSDK(double nativeSDK) {
+        this.nativeSDK = nativeSDK;
+    }
+    
     public double getWebServer() {
         return webServer;
     }
@@ -76,7 +85,11 @@ public class LicenseCount {
         this.range = range;
     }
 
-    
+    /*
+        If more agent types needed to be added, then insure that check for the agent type is made in this file
+        the agent counts gets incremented in the Customer, Application and Tier counts. Increment the 
+        LicenseS.A_INDEX and then add the entry in the WriteFile 
+    */
     //Agent types: 0:Java, 1:IIS, 2:PHP, 3:NodeJS, 4 Machine Agent, 5 Unknown, 6 Web Server
     public String getAgentName(int agentId){
         String val = s.AGENT_NAME_JAVA;
@@ -98,6 +111,10 @@ public class LicenseCount {
                 break;
             case 6:
                 val=s.AGENT_NAME_WEB_SERVER;
+                break;
+            case 7:
+                val=s.AGENT_NAME_C_SDK;
+                break;
             default:
                 break;
         }
@@ -116,6 +133,16 @@ public class LicenseCount {
     }
     
     public int getAgentTypeFromVersion(String version, String type){
+        if(version.contains(s.AGENT_TYPE_CHK_PHP)){return 2;}
+        if(type.contains(s.AGENT_TYPE_CHK_IIS) || version.contains(s.AGENT_TYPE_CHK_IIS)){return 1;}
+        if(version.contains(s.AGENT_TYPE_CHK_NODEJS)){return 3;}
+        if(type.contains(LicenseS.AGENT_TYPE_OTHER)){return 5;} // This might be Java or PHP
+        return 0;
+    }
+    
+    public int getAgentTypeFromVersion(String version, String type, String aType){
+        if(aType.contains(s.AGENT_TYPE_CHK_SDK)){return 7;}
+        if(aType.contains(s.AGENT_TYPE_WEB_SERVER)){return 6;}
         if(version.contains(s.AGENT_TYPE_CHK_PHP)){return 2;}
         if(type.contains(s.AGENT_TYPE_CHK_IIS) || version.contains(s.AGENT_TYPE_CHK_IIS)){return 1;}
         if(version.contains(s.AGENT_TYPE_CHK_NODEJS)){return 3;}

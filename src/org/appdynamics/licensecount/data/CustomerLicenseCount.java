@@ -102,6 +102,7 @@ public class CustomerLicenseCount extends LicenseCount{
                 aRange.totalCount+=tRange.getTotalCount();
                 aRange.iisInternalCount+=tRange.getIisInternalCount();
                 aRange.webserverCount+=tRange.getWebserverCount();
+                aRange.nativeSDKCount+=tRange.getNativeSDKCount();
                 
             }
             //logger.log(Level.INFO, "Value of iisCount " + aRange.iisCount);
@@ -122,6 +123,7 @@ public class CustomerLicenseCount extends LicenseCount{
             totalRangeValue.totalCount+=tRange.totalCount;
             totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
             totalRangeValue.webserverCount+=tRange.webserverCount;
+            totalRangeValue.nativeSDKCount+=tRange.nativeSDKCount;
         }
         
         

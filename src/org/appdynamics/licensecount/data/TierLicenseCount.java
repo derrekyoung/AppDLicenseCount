@@ -197,8 +197,7 @@ public class TierLicenseCount extends LicenseCount{
             ArrayList<String> found=new ArrayList<String>();
             for(NodeLicenseCount node:nodeLicenseCount){
                 if(node.getRangeValues().size() > i && node.getRangeValues().get(i).isCountAsLicense()){
-//                    if(s.debugLevel >= 2) 
-//            logger.log(Level.INFO,new StringBuilder().append("\t\tCounting node type ").append(node.getType()).toString());
+                    if(s.debugLevel >= 2)   logger.log(Level.INFO,new StringBuilder().append("\t\tCounting node type ").append(node.getType()).toString());
                     switch(node.getType()){
                         case 1:
                             //We don't do anything for now, this is will be added up later.
@@ -239,6 +238,11 @@ public class TierLicenseCount extends LicenseCount{
                         case 6:
                             tRange.webserverCount++;
                             tRange.totalCount++;
+                            break;
+                        case 7:
+                            tRange.nativeSDKCount++;
+                            tRange.totalCount++;
+                            break;
                         default:
                             tRange.javaCount++;
                             tRange.totalCount++;
@@ -259,6 +263,7 @@ public class TierLicenseCount extends LicenseCount{
             totalRangeValue.totalCount+=tRange.totalCount;
             totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
             totalRangeValue.webserverCount+=tRange.webserverCount;
+            totalRangeValue.nativeSDKCount+=tRange.nativeSDKCount;
         }
     }
     

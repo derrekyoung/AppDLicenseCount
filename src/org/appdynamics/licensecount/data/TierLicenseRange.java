@@ -13,7 +13,7 @@ import org.appdynamics.licensecount.resources.LicenseS;
  */
 public class TierLicenseRange extends TimeRange{
     protected double javaCount, phpCount, iisCount, iisInternalCount, nodeJSCount, machineCount, 
-            totalCount, tierAppAgentCount, tierMachineAgentCount, webserverCount;
+            totalCount, tierAppAgentCount, tierMachineAgentCount, webserverCount, nativeSDKCount;
 
     public TierLicenseRange(){super();}
 
@@ -54,8 +54,14 @@ public class TierLicenseRange extends TimeRange{
     public void setWebserverCount(double webserverCount) {
         this.webserverCount = webserverCount;
     }
-    
-    
+
+    public double getNativeSDKCount() {
+        return nativeSDKCount;
+    }
+
+    public void setNativeSDKCount(double nativeSDKCount) {
+        this.nativeSDKCount = nativeSDKCount;
+    }
     
     public String getNodeJSCount_C(){
         double val1 = nodeJSCount/10;
@@ -133,6 +139,8 @@ public class TierLicenseRange extends TimeRange{
         bud.append("\t\tDotNet agent count ").append(iisCount).append("\n");
         bud.append("\t\tPHP agent count ").append(phpCount).append("\n");
         bud.append("\t\tNodeJS agent count ").append(nodeJSCount).append("\n");
+        bud.append("\t\tWebServer agent count ").append(webserverCount).append("\n");
+        bud.append("\t\tNative SDK agent count ").append(nativeSDKCount).append("\n");
         bud.append("\t\tMachine agent count ").append(machineCount).append("\n");
         bud.append("\t\tStart time ").append(getDate(start)).append(" :: ").append(start).append("\n");
         bud.append("\t\tEnd time ").append(getDate(end)).append(" :: ").append(end).append("\n");

@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class LicenseS extends OPTS{
     
-    
+    public static final int A_INDEX=8;
     public static final String VERSION_L="version";
     public static final String VERSION_S="v";
     public static final boolean VERSION_R=false;
@@ -126,6 +126,7 @@ public class LicenseS extends OPTS{
     public static final String PHP_AGENT_COUNT="PHP Agent Count";
     public static final String NODEJS_AGENT_COUNT="NodeJS Agent Count";
     public static final String WEBSERVER_AGENT_COUNT="WebServer Agent Count";
+    public static final String NATIVE_SDK_AGENT_COUNT="Native SDK Agent Count";
     public static final String MACHINE_AGENT_COUNT="Machine Agent Count";
     public static final String APPLICATION_AGENT_COUNT="Application Agent Count";
     

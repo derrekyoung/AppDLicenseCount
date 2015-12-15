@@ -133,6 +133,7 @@ public class ApplicationLicenseCount extends LicenseCount{
                 aRange.totalCount+=tRange.getTotalCount();
                 aRange.iisInternalCount+=tRange.iisInternalCount;
                 aRange.webserverCount+=tRange.webserverCount;
+                aRange.nativeSDKCount+=tRange.nativeSDKCount;
                 // This will insure that nodejs is properly counted.
                 
             }
@@ -166,6 +167,7 @@ public class ApplicationLicenseCount extends LicenseCount{
             totalRangeValue.totalCount+=tRange.totalCount;
             totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
             totalRangeValue.webserverCount+=tRange.webserverCount;
+            totalRangeValue.nativeSDKCount+=tRange.nativeSDKCount;
         }
         
     }
