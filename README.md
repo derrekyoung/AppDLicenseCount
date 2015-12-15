@@ -12,7 +12,7 @@ Requirements:
 -------------------
 The AppDLicenseCount solution is dependent on the AppDRESTAPI-SDK 
                (https://github.com/Appdynamics/AppDRESTAPI-SDK.git) 
-version 2.4.0 or above is need for the current version, this should be 
+version 2.4.2 or above is need for the current version, this should be 
 cloned and built before cloning this package. It is recommended that both packages 
 share a base directory, this will make the dependency checking easier. Compile and 
 package the AppDRESTAPI-SDK to insure files that are needed are present. Once this 
