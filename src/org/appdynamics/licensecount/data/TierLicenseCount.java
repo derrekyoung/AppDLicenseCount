@@ -37,7 +37,7 @@ public class TierLicenseCount extends LicenseCount{
     private ArrayList<NodeLicenseCount> nodeLicenseCount=new ArrayList<NodeLicenseCount>();
     private ArrayList<TierLicenseRange> tierLicenseRange=new ArrayList<TierLicenseRange>();
     private ArrayList<TierHourLicenseRange> tierHourLicenseRange=new ArrayList<TierHourLicenseRange>();
-    private TierLicenseRange totalRangeValue;
+    //private TierLicenseRange totalRangeValue;
     
     public TierLicenseCount(){super();}
     
@@ -125,8 +125,8 @@ public class TierLicenseCount extends LicenseCount{
         if(s.debugLevel >= 2) 
             logger.log(Level.INFO,new StringBuilder().append("Populating tier ").append(name).append(" license count for application ").append(applicationName).toString());
         
-        totalRangeValue=new TierLicenseRange("Tier Total Count");
-        totalRangeValue.setStart(totalTimeRange.getStart());totalRangeValue.setEnd(totalTimeRange.getEnd());
+        //totalRangeValue=new TierLicenseRange("Tier Total Count");
+        //totalRangeValue.setStart(totalTimeRange.getStart());totalRangeValue.setEnd(totalTimeRange.getEnd());
         
         /*
          * This is going to get the nodes to count all of the licenses.
@@ -179,7 +179,8 @@ public class TierLicenseCount extends LicenseCount{
     }
     
     //0:Java, 1:IIS, 2:PHP, 3:NodeJS, 4 Machine Agent
-    public void countNodeLicenses(ArrayList<TimeRange> timeRanges,HashMap<String,ArrayList<Node>> dotNetMap, ArrayList<String> dotNetKeys){
+    public void countNodeLicenses(ArrayList<TimeRange> timeRanges,
+            HashMap<String,ArrayList<Node>> dotNetMap, ArrayList<String> dotNetKeys){
         
    
         logger.log(Level.INFO,new StringBuilder().append("Starting tier level license count for tier ").append(name).toString());
@@ -194,7 +195,7 @@ public class TierLicenseCount extends LicenseCount{
             tRange.setEnd(timeRanges.get(i).getEnd());
             tRange.setName(tRange.createName());
             HashMap<String,ArrayList<Node>> dotNetMapTemp=new HashMap<String,ArrayList<Node>>(dotNetMap);
-            ArrayList<String> found=new ArrayList<String>();
+            ArrayList<String> foundDotNet=new ArrayList<String>();
             for(NodeLicenseCount node:nodeLicenseCount){
                 if(node.getRangeValues().size() > i && node.getRangeValues().get(i).isCountAsLicense()){
                     if(s.debugLevel >= 2)   logger.log(Level.INFO,new StringBuilder().append("\t\tCounting node type ").append(node.getType()).toString());
@@ -205,11 +206,12 @@ public class TierLicenseCount extends LicenseCount{
                             
                             StringBuilder bud = new StringBuilder();
                             bud.append("\n\tAdding .Net node ").append(node.getNode().getName()).append("\n\tiisCount orig value ").append(tRange.iisCount);
-                            if(dotNetMapTemp.containsKey(node.getMachineName()) && !found.contains(node.getMachineName())
+                            if(dotNetMapTemp.containsKey(node.getMachineName()) 
+                                    && !foundDotNet.contains(node.getMachineName())
                                     && ! dotNetKeys.contains(getNodeKey(tRange,node.getMachineName()))){
                                 tRange.iisCount++;
                                 tRange.totalCount++;
-                                found.add(node.getMachineName());//dotNetMapTemp.remove(node.getMachineName());
+                                foundDotNet.add(node.getMachineName());//dotNetMapTemp.remove(node.getMachineName());
                                 dotNetKeys.add(getNodeKey(tRange,node.getMachineName()));
                                 bud.append("\n----------------------------------------\n start:").append(tRange.getStart()).append(" -- ").append(tRange.getEnd());
                                 bud.append(" :: ").append(node.getNode().getTierName());
@@ -254,6 +256,7 @@ public class TierLicenseCount extends LicenseCount{
             tierLicenseRange.add(tRange);
         }
         
+        /*
         for(TierLicenseRange tRange: tierLicenseRange){
             totalRangeValue.iisCount+=tRange.iisCount;
             totalRangeValue.javaCount+=tRange.javaCount;
@@ -265,6 +268,7 @@ public class TierLicenseCount extends LicenseCount{
             totalRangeValue.webserverCount+=tRange.webserverCount;
             totalRangeValue.nativeSDKCount+=tRange.nativeSDKCount;
         }
+                */
     }
     
     
@@ -276,6 +280,7 @@ public class TierLicenseCount extends LicenseCount{
         this.tierLicenseRange = tierLicenseRange;
     }
 
+    /*
     public TierLicenseRange getTotalRangeValue() {
         return totalRangeValue;
     }
@@ -283,7 +288,7 @@ public class TierLicenseCount extends LicenseCount{
     public void setTotalRangeValue(TierLicenseRange totalRangeValue) {
         this.totalRangeValue = totalRangeValue;
     }
-
+*/
     public ArrayList<TierHourLicenseRange> getTierHourLicenseRange() {
         return tierHourLicenseRange;
     }

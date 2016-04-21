@@ -14,9 +14,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import org.appdynamics.appdrestapi.data.Node;
 
 /**
  *
@@ -31,6 +33,8 @@ public class CustomerLicenseCount extends LicenseCount{
     private ArrayList<CustomerLicenseRange> customerRangeValues=new ArrayList<CustomerLicenseRange>();
     private HashMap<String, ArrayList<ApplicationLicenseCount>> groupings=new HashMap<String, ArrayList<ApplicationLicenseCount>>();
     private CustomerLicenseRange totalRangeValue;
+    private HashMap<String,HashMap<Integer,ArrayList<Node>>> dotNetMap=new HashMap<String,HashMap<Integer,ArrayList<Node>>>();
+    private HashMap<String,HashMap<Integer,ArrayList<String>>> dotNetMapLog=new HashMap<String,HashMap<Integer,ArrayList<String>>>();
     
     private ArrayList<org.appdynamics.appdrestapi.util.TimeRange> timeRanges=new ArrayList<org.appdynamics.appdrestapi.util.TimeRange>();
     private org.appdynamics.appdrestapi.util.TimeRange totalRange;
@@ -70,7 +74,7 @@ public class CustomerLicenseCount extends LicenseCount{
             app.populateLicense(access.getNodesForApplication(app.getApplicationId()), access, timeRanges,totalRange);
         }
         
- 
+        
         /*
         
         */
@@ -86,6 +90,12 @@ public class CustomerLicenseCount extends LicenseCount{
             tCount.countTierLicenses(timeRanges);
         }
         
+        populateDotNetMap();
+        
+        CountAgents cntAgents = new CountAgents();
+        cntAgents.countCustomerLicenses(this, dotNetMap);
+        
+        /*
         for(int i=0; i < timeRanges.size(); i++){
             CustomerLicenseRange aRange = new CustomerLicenseRange();
             aRange.setStart(timeRanges.get(i).getStart());
@@ -126,7 +136,7 @@ public class CustomerLicenseCount extends LicenseCount{
             totalRangeValue.nativeSDKCount+=tRange.nativeSDKCount;
         }
         
-        
+        */
         
     }
 
@@ -251,6 +261,84 @@ public class CustomerLicenseCount extends LicenseCount{
     public HashMap<String, ArrayList<ApplicationLicenseCount>> getGroupings() {
         return groupings;
     }    
+    
+    
+    public void populateDotNetMap(){
+        // [MN] -> [AN] --> Nodes     <String,HashMap<Integer,ArrayList<Node>>>
+        // HashMap<Integer,ApplicationLicenseCount> 
+        Iterator<Integer> keyIter = applications.keySet().iterator();
+        while(keyIter.hasNext()){
+            Integer key = keyIter.next();
+            ApplicationLicenseCount appc = applications.get(key);
+            Iterator<String> mn = appc.getDotNetMap().keySet().iterator();
+            while(mn.hasNext()){
+                String mnKey = mn.next();
+                if(dotNetMap.containsKey(mn)){
+                    dotNetMap.get(mnKey).put(key, appc.getDotNetMap().get(mnKey));
+                }else{
+                    HashMap<Integer,ArrayList<Node>> map1=new HashMap<Integer,ArrayList<Node>>();
+                    map1.put(key, appc.getDotNetMap().get(mnKey));
+                    dotNetMap.put(mnKey, map1);
+                }
+            }
+        }
+        
+        //<String,HashMap<Integer,ArrayList<Node>>>
+        //<String,HashMap<Integer,ArrayList<String>>>
+        
+        logger.log(Level.INFO,"Start to get the license weights for the nodes " + dotNetMap.keySet().size());
+        // This is now going to get the counts for the .Net and php agents.
+        for(String key: dotNetMap.keySet()){
+            HashMap<Integer,ArrayList<Node>> nm=dotNetMap.get(key);       
+            StringBuilder scr;
+            StringBuilder bud=new StringBuilder();
+            double size = 0; //dotNetMap.get(key).size();
+            ArrayList<String> mLog=new ArrayList<String>();
+            for(Integer _app:nm.keySet()){
+                size+=nm.get(_app).size();
+                for(Node node:nm.get(_app)){
+                    scr=new StringBuilder().append("\tDotNet license usage in tier '").append(node.getTierName()).append("' for node '").append(node.getName())
+                        .append("'\n");
+                    mLog.add(scr.toString());
+                    bud.append(scr.toString());
+                }
+                // An app list
+                if(dotNetMapLog.containsKey(key)){
+                    HashMap<Integer,ArrayList<String>> a=dotNetMapLog.get(key);
+                    a.put(_app, mLog);
+                    dotNetMapLog.put(key, a);
+                }else{
+                    HashMap<Integer,ArrayList<String>> a=new HashMap<Integer,ArrayList<String>>();
+                    a.put(_app, mLog);
+                    dotNetMapLog.put(key, a);
+                }
+            }
+
+            
+
+            logger.log(Level.INFO,bud.toString());
+        }
+                
+        
+    }
+
+    public HashMap<String,HashMap<Integer,ArrayList<String>>> getDotNetMapLog() {
+        return dotNetMapLog;
+    }
+
+    public void setDotNetMapLog(HashMap<String,HashMap<Integer,ArrayList<String>>> dotNetMapLog) {
+        this.dotNetMapLog = dotNetMapLog;
+    }
+
+    
+    public HashMap<String,HashMap<Integer,ArrayList<Node>>> getDotNetMap() {
+        return dotNetMap;
+    }
+
+    public void setDotNetMap(HashMap<String,HashMap<Integer,ArrayList<Node>>> dotNetMap) {
+        this.dotNetMap = dotNetMap;
+    }
+    
     
     @Override
     public String toString(){

@@ -12,6 +12,9 @@ import java.util.HashMap;
 /**
  *
  * @author gilbert.solorzano
+ * 
+ * 
+ * This is going to be a roll up count
  */
 public class EUMPageLicenseRange extends TimeRange{
     private long pageCounts;

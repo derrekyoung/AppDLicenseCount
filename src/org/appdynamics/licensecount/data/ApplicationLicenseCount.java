@@ -60,6 +60,7 @@ public class ApplicationLicenseCount extends LicenseCount{
         totalRangeValue.setStart(totalTimeRange.getStart());
         totalRangeValue.setEnd(totalTimeRange.getEnd());
         
+        
         //If just in case we don't have any nodes
         if(nodes == null) return;
         
@@ -299,6 +300,14 @@ public class ApplicationLicenseCount extends LicenseCount{
 
     public void setDotNetMap(HashMap<String, ArrayList<Node>> dotNetMap) {
         this.dotNetMap = dotNetMap;
+    }
+
+    public ArrayList<String> getDotNetKeys() {
+        return dotNetKeys;
+    }
+
+    public void setDotNetKeys(ArrayList<String> dotNetKeys) {
+        this.dotNetKeys = dotNetKeys;
     }
     
     

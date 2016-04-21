@@ -16,13 +16,13 @@ import java.util.ArrayList;
  */
 public class LicenseS extends OPTS{
     
-    public static final int A_INDEX=8;
+    public static final int A_INDEX=8; // This is the agent index
     public static final String VERSION_L="version";
     public static final String VERSION_S="v";
     public static final boolean VERSION_R=false;
     public static final boolean VERSION_A=false;
     public static final String VERSION_D="Prints out the version of the tool";
-    public static final String VERSION_V="1.4.0";
+    public static final String VERSION_V="1.5.0";
     
     public static final String FILENAME_L="file";
     public static final String FILENAME_S="f";
