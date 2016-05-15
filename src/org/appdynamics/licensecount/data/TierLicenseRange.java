@@ -13,7 +13,7 @@ import org.appdynamics.licensecount.resources.LicenseS;
  */
 public class TierLicenseRange extends TimeRange{
     protected double javaCount, phpCount, iisCount, iisInternalCount, nodeJSCount, machineCount, 
-            totalCount, tierAppAgentCount, tierMachineAgentCount, webserverCount, nativeSDKCount;
+            totalCount, tierAppAgentCount, tierMachineAgentCount, webserverCount, nativeSDKCount, eumCount, dbCount;
 
     public TierLicenseRange(){super();}
 
@@ -129,6 +129,23 @@ public class TierLicenseRange extends TimeRange{
                 .append(new Double(iisInternalCount).intValue()).append(")");
         return bud.toString();
     }
+
+    public double getEumCount() {
+        return eumCount;
+    }
+
+    public void setEumCount(double eumCount) {
+        this.eumCount = eumCount;
+    }
+
+    public double getDbCount() {
+        return dbCount;
+    }
+
+    public void setDbCount(double dbCount) {
+        this.dbCount = dbCount;
+    }
+        
     
     @Override
     public String toString(){

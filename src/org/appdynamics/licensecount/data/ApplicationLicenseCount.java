@@ -4,14 +4,16 @@
  */
 package org.appdynamics.licensecount.data;
 
+import org.appdynamics.licensecount.resources.LicenseS;
+import org.appdynamics.licensecount.actions.*;
 import org.appdynamics.appdrestapi.RESTAccess;
 import org.appdynamics.appdrestapi.data.*;
 import org.appdynamics.appdrestapi.resources.s;
+import org.appdynamics.appdrestapi.util.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import org.appdynamics.appdrestapi.util.*;
+
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -25,6 +27,7 @@ public class ApplicationLicenseCount extends LicenseCount{
     private String applicationName;
     private int applicationId;
     private int tierCount=0;
+    private ArrayList<EUMPageLicenseCount> eumPages=new ArrayList<EUMPageLicenseCount>();
     private HashMap<Integer,Tier> tierLicensesNoNodes=new HashMap<Integer,Tier>(); 
     private HashMap<Integer,TierLicenseCount> tierLicenses=new HashMap<Integer,TierLicenseCount>(); 
     private ArrayList<ApplicationLicenseRange> appLicenseRange= new ArrayList<ApplicationLicenseRange>();
@@ -67,7 +70,7 @@ public class ApplicationLicenseCount extends LicenseCount{
         
         /*
          *  First we are going to get all of the nodes, then match them with their tier.
-         */
+        */
         for(Node node:nodes.getNodes()){
             if(!tierLicenses.containsKey(node.getTierId()))
                 tierLicenses.put(node.getTierId(), new TierLicenseCount(node.getTierName()));
@@ -77,6 +80,7 @@ public class ApplicationLicenseCount extends LicenseCount{
             //NodeLicenseCount nodeL=tierLicenses.get(node.getTierId()).addNodeRange(node);
             tierLicenses.get(node.getTierId()).addNodeRange(node); 
         }
+        
         
         Tiers tiers = access.getTiersForApplication(applicationId);
         if(tiers != null){
@@ -90,18 +94,57 @@ public class ApplicationLicenseCount extends LicenseCount{
             }
         }
         
-
         
         /*
          * Now that we have all of the nodes we are going to get all of the tiers to count
          * the nodes. 
-         */
+        */
         for(TierLicenseCount tCount: tierLicenses.values()){
             tCount.populateNodeLicenseRange(totalTimeRange, listOfTimes, access, applicationName);
         }
         
+        
+        
+        /*
+            This is going to be captured the EUM data
+            First we are going to get the list of pages for this app.
+        
+        */
+        
+        if(LicenseS.EUM_V){
+            // First we are going to get the pages
+            if(s.debugLevel > 1) logger.log(Level.INFO,"EUM Pages License count requested");
+            // logger.log(Level.INFO,"The info totalTimeRange " + totalTimeRange + " -- " + listOfTimes.size());
+            MetricItems eumIT=access.getBaseMetricListPath(applicationName, LicenseS.EUM_PAGES_PATH);
+            if(eumIT != null){
+                for(MetricItem mi:eumIT.getMetricItems()){
+                    // if(s.debugLevel > 2) logger.log(Level.INFO,new StringBuilder().append("EUM page ").append(mi.getName()).append(" the license usage for this page will be counted").toString());
+                    EUMPageLicenseCount epc=new EUMPageLicenseCount(mi.getName(),mi.getName());
+                    epc.setTotalRangeValue(new EUMPageLicenseRange());
+                    eumPages.add(epc);
+                }
+
+                ThreadExecutor execNodes = new ThreadExecutor(4);
+
+                for(EUMPageLicenseCount pageL:eumPages){
+                    //public NodeExecutor(NodeLicenseCount nodeLic,RESTAccess access, 
+                    //String appName, TimeRange totalTimeRange, 
+                    //ArrayList<TimeRange> timeRanges, String tierAgentType)
+                    EUMExecuter eumExec = new EUMExecuter(pageL, access, applicationName, totalTimeRange, listOfTimes);
+                    execNodes.getExecutor().execute(eumExec);
+                    //nodeL.populateNodeLicenseRange(totalTimeRange, timeRanges, access, applicationName, tierAgentType);
+                }
+                execNodes.getExecutor().shutdown();
+                execNodes.shutdown();
+            }else{
+                logger.log(Level.WARNING,"EUM page license count requested but none returned from base query.");
+            }
+            
+        }
+        
     }
 
+    
     public void countTierLicenses(ArrayList<TimeRange> timeRanges){
         if(s.debugLevel >= 2) 
             logger.log(Level.INFO,new StringBuilder().append("Begin application level tier license count.").toString());
@@ -116,6 +159,14 @@ public class ApplicationLicenseCount extends LicenseCount{
         //logger.log(Level.INFO,"Starting the nodeLicense count.");
         for(TierLicenseCount tCount: tierLicenses.values()){
             tCount.countNodeLicenses(timeRanges,dotNetMap,dotNetKeys);
+        }
+        
+        if(LicenseS.EUM_V){
+           
+            for(EUMPageLicenseCount pageL:eumPages){
+                    pageL.countEUMPageLicenseRange();
+            }
+            
         }
         
         for(int i=0; i < timeRanges.size(); i++){
@@ -141,6 +192,13 @@ public class ApplicationLicenseCount extends LicenseCount{
             if(aRange.getNodeJSCount() > 0)  
                     aRange.totalCount= (aRange.getTotalCount() - aRange.getNodeJSCount()) + licenseRound(aRange.getNodeJSCount()/10);
             appLicenseRange.add(aRange);
+            
+            if(LicenseS.EUM_V){
+                for(EUMPageLicenseCount ep:eumPages){
+                    EUMPageLicenseRange er=ep.getPageLicenseRange().get(i);
+                    aRange.eumCount+=er.getValue();
+                }
+            }
         }
         
         // This is going to get the tier counts:
@@ -169,10 +227,22 @@ public class ApplicationLicenseCount extends LicenseCount{
             totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
             totalRangeValue.webserverCount+=tRange.webserverCount;
             totalRangeValue.nativeSDKCount+=tRange.nativeSDKCount;
+            totalRangeValue.eumCount+=tRange.eumCount;
         }
+        
+        
         
     }
 
+    public ArrayList<EUMPageLicenseCount> getEumPages() {
+        return eumPages;
+    }
+
+    public void setEumPages(ArrayList<EUMPageLicenseCount> eumPages) {
+        this.eumPages = eumPages;
+    }
+
+    
     public HashMap<Integer, Tier> getTierLicensesNoNodes() {
         return tierLicensesNoNodes;
     }

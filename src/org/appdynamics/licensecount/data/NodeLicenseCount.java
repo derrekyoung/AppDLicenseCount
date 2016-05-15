@@ -136,9 +136,11 @@ public class NodeLicenseCount extends LicenseCount{
                 tempTotalCount++;
             }
         }
-        if(totalRangeValue == null) logger.log(Level.WARNING,"totalRangeValue is null: " + toString());
-        totalRangeValue.setCount(tempTotalCount);
-        totalRangeValue.setCountAsLicense(true);
+        if(totalRangeValue == null){ logger.log(Level.WARNING,"totalRangeValue is null: " + toString());}
+        else{
+            totalRangeValue.setCount(tempTotalCount);
+            totalRangeValue.setCountAsLicense(true);
+        }
     }
 
     public double getLicWeight() {

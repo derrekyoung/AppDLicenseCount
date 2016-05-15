@@ -178,6 +178,7 @@ public class TierLicenseCount extends LicenseCount{
         return bud.toString();
     }
     
+    
     //0:Java, 1:IIS, 2:PHP, 3:NodeJS, 4 Machine Agent
     public void countNodeLicenses(ArrayList<TimeRange> timeRanges,
             HashMap<String,ArrayList<Node>> dotNetMap, ArrayList<String> dotNetKeys){
@@ -256,21 +257,9 @@ public class TierLicenseCount extends LicenseCount{
             tierLicenseRange.add(tRange);
         }
         
-        /*
-        for(TierLicenseRange tRange: tierLicenseRange){
-            totalRangeValue.iisCount+=tRange.iisCount;
-            totalRangeValue.javaCount+=tRange.javaCount;
-            totalRangeValue.phpCount+=tRange.phpCount;
-            totalRangeValue.nodeJSCount+=tRange.nodeJSCount;
-            totalRangeValue.machineCount+=tRange.machineCount;
-            totalRangeValue.totalCount+=tRange.totalCount;
-            totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
-            totalRangeValue.webserverCount+=tRange.webserverCount;
-            totalRangeValue.nativeSDKCount+=tRange.nativeSDKCount;
-        }
-                */
+
     }
-    
+   
     
     public ArrayList<TierLicenseRange> getTierLicenseRange() {
         return tierLicenseRange;

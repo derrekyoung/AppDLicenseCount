@@ -69,6 +69,8 @@ public class LicenseOptions {
         
         options.addOption(LicenseS.NOW_S, LicenseS.NOW_L, LicenseS.NOW_A, LicenseS.NOW_D);
         
+        options.addOption(LicenseS.EUM_S, LicenseS.EUM_L, LicenseS.EUM_A, LicenseS.EUM_D);
+        options.addOption(LicenseS.DB_S, LicenseS.DB_L, LicenseS.DB_A, LicenseS.DB_D);
         
         Option debug = OptionBuilder.withLongOpt(LicenseS.DEBUG_L).withArgName( LicenseS.DEBUG_S )
                                 .hasArg()
@@ -148,6 +150,14 @@ public class LicenseOptions {
             
             if(cmdLine.hasOption(LicenseS.NOW_L) || cmdLine.hasOption(LicenseS.NOW_S)){
                 LicenseS.NOW_V=true;
+            }
+            
+            if(cmdLine.hasOption(LicenseS.EUM_L) || cmdLine.hasOption(LicenseS.EUM_S)){
+                LicenseS.EUM_V=true;
+            }
+            
+            if(cmdLine.hasOption(LicenseS.DB_L) || cmdLine.hasOption(LicenseS.DB_S)){
+                LicenseS.DB_V=true;
             }
             
             

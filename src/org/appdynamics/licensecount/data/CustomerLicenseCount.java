@@ -84,12 +84,13 @@ public class CustomerLicenseCount extends LicenseCount{
     
     public void countTierLicenses(){
         if(s.debugLevel >= 2) 
-            logger.log(Level.INFO,new StringBuilder().append("Initiating count of licenses.").toString());
+            logger.log(Level.INFO,new StringBuilder().append("Initiating count of licenses for ").append(timeRanges.size()).append(".").toString());
         //This is going to count the licenses
+        /*
         for(ApplicationLicenseCount tCount: applications.values()){
             tCount.countTierLicenses(timeRanges);
         }
-        
+        */
         populateDotNetMap();
         
         CountAgents cntAgents = new CountAgents();
@@ -270,6 +271,7 @@ public class CustomerLicenseCount extends LicenseCount{
         while(keyIter.hasNext()){
             Integer key = keyIter.next();
             ApplicationLicenseCount appc = applications.get(key);
+            appc.populateDotNetMap();
             Iterator<String> mn = appc.getDotNetMap().keySet().iterator();
             while(mn.hasNext()){
                 String mnKey = mn.next();

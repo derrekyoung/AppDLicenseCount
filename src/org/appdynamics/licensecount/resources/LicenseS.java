@@ -17,83 +17,8 @@ import java.util.ArrayList;
 public class LicenseS extends OPTS{
     
     public static final int A_INDEX=8; // This is the agent index
-    public static final String VERSION_L="version";
-    public static final String VERSION_S="v";
-    public static final boolean VERSION_R=false;
-    public static final boolean VERSION_A=false;
-    public static final String VERSION_D="Prints out the version of the tool";
-    public static final String VERSION_V="1.5.0";
-    
-    public static final String FILENAME_L="file";
-    public static final String FILENAME_S="f";
-    public static final String FILENAME_D="Optional : This is going to be the file name that is going to be created. Default is <AccountName>_LicenseCount.xlsx.";
-    public static final boolean FILENAME_R=false;
-    public static final boolean FILENAME_A=true;
-    
-    public static final String INTERVAL_L="interval";
-    public static final String INTERVAL_S="i";
-    public static final String INTERVAL_D="Optional : This is going to be the number of days we go back and run. Default is going back 7 days from midnight to midnight.  ";
-    public static final boolean INTERVAL_R=false;
-    public static final boolean INTERVAL_A=true;
-    
-    public static final String CFG_FILE_L="config";
-    public static final String CFG_FILE_S="C";
-    public static final String CFG_FILE_D="";
-    public static final boolean CFG_FILE_R=false;
-    public static final boolean CFG_FILE_A=true;
-    
-    // Uptime : default 25%
-    public static final String UPTIME_L="uptime";
-    public static final String UPTIME_S="U";
-    public static final String UPTIME_D="Optional : The amount of uptime necessary for an agent to be up so that it is counted. Default value is .70 (70%)";
-    public static final boolean UPTIME_R=false;
-    public static final boolean UPTIME_A=true;
-    
-    //This will be added to limit the number of apps reported.
-    public static final String APPS_L="apps";
-    public static final String APPS_S="A";
-    public static final String APPS_D="Optional : The applications that you want to report on, comma delimited list.";
-    public static final boolean APPS_R=false;
-    public static final boolean APPS_A=true;
-    public static ArrayList<String> APPS_V=new ArrayList<String>();
-    //
-    public static final String NOW_L="now";
-    public static final String NOW_S="n";
-    public static final String NOW_D="Include upto the last full hour for the agent count";
-    public static final boolean NOW_R=false;
-    public static final boolean NOW_A=false;
-    public static boolean NOW_V=false;
-    
-    public static final String NODE_L="node";
-    public static final String NODE_S="N";
-    public static final String NODE_D="Provide an additional sheet with a node hourly breakdown";
-    public static final boolean NODE_R=false;
-    public static final boolean NODE_A=false;
-    public static boolean NODE_V=false;
-    
-    //Log File
-    
-    public static final String LOGFILE_L="logfile";
-    public static final String LOGFILE_S="L";
-    public static final String LOGFILE_D="Path to the log file";
-    public static final boolean LOGFILE_R=false;
-    public static final boolean LOGFILE_A=true;
-    public static String LOGFILE_V="";
     
     
-    public static final String USAGE="java -jar AppDynamicsLC.jar";
-    public static final String FILE_ENDING="_LicenseCount.xlsx";
-    
-    public static final String GROUP_L = "groupfile";
-    public static final String GROUP_S = "g";
-    public static final String GROUP_D = "Path to group reference file";
-    public static final boolean GROUP_R = false;
-    public static final boolean GROUP_A =true;
-    public static String GROUP_V = "";
-
-    
-    public static String FILENAME_V="Customer1";
-    public static int INTERVAL_V=7;
     
     
     /** Excel Strings **/
@@ -107,6 +32,7 @@ public class LicenseS extends OPTS{
     public static final String WINDOWS_HOST="Windows Host";
     public static final String WINDOWS_MAPPING="Windows Mapping";
     public static final String BU_LICENSE_SUMMARY = "Business Unit License Summary";
+    public static final String EUM_SUMMARY="EUM Summary";
 
     
     public static final String CUSTOMER_NAME="Cutomer Name";
@@ -118,6 +44,7 @@ public class LicenseS extends OPTS{
     public static final String TIER_AGENT_TYPE="Tier Agent Type";
     public static final String TIER_ID="Tier ID";
     public static final String GROUP_NAME="Group Name";
+    public static final String EUM_PAGE_NAME="EUM Page Name";
   
     
     public static final String TOTAL_AGENT_COUNT="Total Agent Count";

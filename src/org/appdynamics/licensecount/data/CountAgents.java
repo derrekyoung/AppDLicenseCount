@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import static org.appdynamics.licensecount.data.LicenseCount.licenseRound;
+import org.appdynamics.licensecount.resources.LicenseS;
 
 /**
  *
@@ -38,8 +39,6 @@ public class CountAgents {
             HashMap<String,HashMap<Integer,
                     ArrayList<Node>>> dotNetMap){
         
-        if(s.debugLevel >= 2) 
-            logger.log(Level.INFO,new StringBuilder().append("Initiating count of licenses.").toString());
         //This is going to count the licenses
         ArrayList<String> dotNetKeys=new ArrayList<String>();
         ArrayList<String> machineKeys=new ArrayList<String>();
@@ -54,8 +53,7 @@ public class CountAgents {
         for(ApplicationLicenseCount aCount: cc.getApplications().values()){
             countAppLicenses(aCount,cc.getTimeRanges(),dotNetMap,dotNetKeys,machineKeys);
         }
-        
-      
+             
         
         for(int i=0; i < cc.getTimeRanges().size(); i++){
             CustomerLicenseRange aRange = new CustomerLicenseRange();
@@ -74,6 +72,7 @@ public class CountAgents {
                 aRange.iisInternalCount+=tRange.getIisInternalCount();
                 aRange.webserverCount+=tRange.getWebserverCount();
                 aRange.nativeSDKCount+=tRange.getNativeSDKCount();
+                aRange.eumCount+=tRange.getEumCount();
                 
             }
             //logger.log(Level.INFO, "Value of iisCount " + aRange.iisCount);
@@ -100,6 +99,7 @@ public class CountAgents {
             cc.getTotalRangeValue().iisInternalCount+=tRange.iisInternalCount;
             cc.getTotalRangeValue().webserverCount+=tRange.webserverCount;
             cc.getTotalRangeValue().nativeSDKCount+=tRange.nativeSDKCount;
+            cc.getTotalRangeValue().eumCount +=tRange.eumCount;
         }
         
         
@@ -133,6 +133,14 @@ public class CountAgents {
             countNodeLicenses(tCount,timeRanges,dotNetMap,dotNetKeys,machineKeys);
         }
         
+        if(LicenseS.EUM_V){
+           
+            for(EUMPageLicenseCount pageL:ac.getEumPages()){
+                    countEUMPageLicenseRange(pageL);
+            }
+            
+        }
+        
         for(int i=0; i < timeRanges.size(); i++){
             ApplicationLicenseRange aRange = new ApplicationLicenseRange();
             aRange.setStart(timeRanges.get(i).getStart());
@@ -156,6 +164,12 @@ public class CountAgents {
             if(aRange.getNodeJSCount() > 0)  
                     aRange.totalCount= (aRange.getTotalCount() - aRange.getNodeJSCount()) + licenseRound(aRange.getNodeJSCount()/10);
             ac.getAppLicenseRange().add(aRange);
+            if(LicenseS.EUM_V){
+                for(EUMPageLicenseCount ep:ac.getEumPages()){
+                    EUMPageLicenseRange er=ep.getPageLicenseRange().get(i);
+                    aRange.eumCount+=er.getValue();
+                }
+            }
         }
         
         // This is going to get the tier counts:
@@ -184,6 +198,7 @@ public class CountAgents {
             ac.getTotalRangeValue().iisInternalCount+=tRange.iisInternalCount;
             ac.getTotalRangeValue().webserverCount+=tRange.webserverCount;
             ac.getTotalRangeValue().nativeSDKCount+=tRange.nativeSDKCount;
+            ac.getTotalRangeValue().eumCount+=tRange.eumCount;
         }
         
     }
@@ -235,7 +250,7 @@ public class CountAgents {
                             tRange.iisInternalCount++;
                             bud.append("\n\tiisCount new value ").append(tRange.iisCount).append(" and iisInternalCount new value ").append(tRange.iisInternalCount);
 
-                            
+                           // logger.log(Level.INFO, bud.toString());
                             break;
                         case 2:
                             //We don't do anything for now, this will be added up later
@@ -281,5 +296,28 @@ public class CountAgents {
         StringBuilder bud = new StringBuilder();
         bud.append(tRange.getStart()).append("-").append(tRange.getEnd()).append("-").append(machineName);        
         return bud.toString();
+    }
+    
+     /*
+        This is going to interate through all of the ranges and add up all of the counts for that particular 
+        range.
+    */
+    private void countEUMPageLicenseRange(EUMPageLicenseCount ec){
+        long tempTotalCount=0;
+        
+        for(EUMPageLicenseRange nodeR:ec.getPageLicenseRange()){
+            
+            for(MetricValue met:nodeR.getMetricValues().getMetricValue()){
+                nodeR.setValue(nodeR.getValue() + met.getCount());
+            }
+            tempTotalCount+=nodeR.getValue();
+        }
+        
+        if(ec.getTotalRangeValue() == null){ logger.log(Level.WARNING,"totalRangeValue is null: " + toString());}
+        else{
+            ec.getTotalRangeValue().setValue(tempTotalCount);
+            ec.getTotalRangeValue().setCountAsLicense(true);
+        }
+        
     }
 }

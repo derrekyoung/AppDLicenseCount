@@ -8,6 +8,7 @@ import org.appdynamics.appdrestapi.resources.s;
 import org.appdynamics.licensecount.resources.LicenseS;
 import org.appdynamics.licensecount.data.*;
 import org.appdynamics.appdrestapi.data.Tier;
+import org.appdynamics.appdrestapi.data.Node;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,7 +51,12 @@ public class WriteExcelDoc {
         XSSFSheet licenseTiers = workbook.createSheet(LicenseS.TIER_SUMMARY);
         XSSFSheet licenseHourlyTiers = workbook.createSheet(LicenseS.HOURLY_TIER_SUMMARY);
         XSSFSheet licensedHourlyNodes=null;
+        XSSFSheet licensedEUM=null;
         if(LicenseS.NODE_V) licensedHourlyNodes=workbook.createSheet(LicenseS.HOURLY_NODE_SUMMARY);
+        if(LicenseS.EUM_V){ 
+            licensedEUM=workbook.createSheet(LicenseS.EUM_SUMMARY);
+            addEUMPages(licensedEUM);
+        }
         XSSFSheet licenseNodeInfo = workbook.createSheet(LicenseS.NODE_INFO_SUMMARY);
         XSSFSheet licenseNoNodeTiers = workbook.createSheet(LicenseS.TIERS_WITH_NO_NODES);
         XSSFSheet licenseDotNetNodeMap = workbook.createSheet(LicenseS.DOTNET_NODE_MAP);
@@ -947,66 +953,104 @@ public class WriteExcelDoc {
     public void addDotNetMap(XSSFSheet curSheet){
         // Create the header
         int row=0;
+        String appName=null;
         Row mainRow = curSheet.createRow(row);
-        row+=2;
-
    
         Cell cell = mainRow.createCell(0);
-        cell.setCellValue(LicenseS.APPLICATION_NAME);
-        cell = mainRow.createCell(1);
         cell.setCellValue(LicenseS.WINDOWS_HOST);
+        cell = mainRow.createCell(1);
+        cell.setCellValue(LicenseS.APPLICATION_NAME); //APPLICATION_NAME
         cell = mainRow.createCell(2);
         cell.setCellValue(LicenseS.WINDOWS_MAPPING);
 
         
+        // we have a new map in the form of new HashMap<String,HashMap<Integer,ArrayList<String>>>
+        Iterator<String> machineIter = customer.getDotNetMapLog().keySet().iterator();
+        while(machineIter.hasNext()){
+            String machineName = machineIter.next();
+            HashMap<Integer,ArrayList<String>> dotNetCnt = customer.getDotNetMapLog().get(machineName);
+                 
+            Iterator<Integer> appIter = dotNetCnt.keySet().iterator();
+            
+            // These are the keys which are the apps.
+            while(appIter.hasNext()){
+                
+                Integer _key=appIter.next();
+                appName = customer.getApplications().get(_key).getApplicationName();
+
+                
+                for(String nn:dotNetCnt.get(_key)){
+                        row++;
+                        mainRow = curSheet.createRow(row);
+                        cell = mainRow.createCell(0);
+                        cell.setCellValue(machineName);
+            
+                        cell = mainRow.createCell(1);
+                        cell.setCellValue(appName);
+                        
+                        cell = mainRow.createCell(2);
+                        cell.setCellValue(nn);
+                }
+                                                
+            }
+
+        }
         
-        Iterator<Integer> appIter = customer.getApplications().keySet().iterator();
-        while(appIter.hasNext()){
-            Integer appId = appIter.next();
-            ApplicationLicenseCount appCount = customer.getApplications().get(appId);
-            Iterator<String> keys = appCount.getDotNetMapLog().keySet().iterator();
-            int count=0;
-            
-            /*
-            mainRow = curSheet.createRow(row);
-            cell = mainRow.createCell(0);
-            cell.setCellValue(appCount.getApplicationName());
+        
+    }
+    
+    public void addEUMPages(XSSFSheet curSheet){
+        // Create the header
+        int row=0;
+        String appName=null;
+        Row mainRow = curSheet.createRow(row);
+   
+        Cell cell = mainRow.createCell(0);
+        cell.setCellValue(LicenseS.CUSTOMER_NAME);
+        cell = mainRow.createCell(1);
+        cell.setCellValue(LicenseS.APPLICATION_NAME); //APPLICATION_NAME
+        cell = mainRow.createCell(2);
+        cell.setCellValue(LicenseS.EUM_PAGE_NAME);
+        
+                
+        // Create the date headers
+        int columnCount=3;
+        for(CustomerLicenseRange cRange:customer.getCustomerRangeValues()){
+            cell=mainRow.createCell(columnCount);cell.setCellValue(cRange.getColumnName());
+            columnCount++;
+        }
+        row++;
+        mainRow = curSheet.createRow(row);
+        cell=mainRow.createCell(0);cell.setCellValue(customer.getName());
+        columnCount=3;
+        for(CustomerLicenseRange cRange:customer.getCustomerRangeValues()){
+            cell=mainRow.createCell(columnCount);cell.setCellValue(cRange.getEumCount());
+            columnCount++;
+        }
+
+        
+        int colCnt=1;
+        for(ApplicationLicenseCount appL:customer.getApplications().values()){
             row++;
-            int count=0;
             mainRow = curSheet.createRow(row);
-            */
             
-            while(keys.hasNext()){
-                if(count == 0){
-                    row++;
-                   
-                    mainRow = curSheet.createRow(row);
-                    cell = mainRow.createCell(0);
-                    cell.setCellValue(appCount.getApplicationName());
-                    row++;
-                    count++;
-                    
-                }
-                
-                mainRow = curSheet.createRow(row);
-                String key=keys.next();
-                cell = mainRow.createCell(1);
-                cell.setCellValue(key);
-                row++;
-                
-                //We need to iterate again
-                for(String val: appCount.getDotNetMapLog().get(key)){  
-                    mainRow = curSheet.createRow(row);
-                    cell = mainRow.createCell(2);
-                    cell.setCellValue(val);
-                    row++;
-                }
-                row++;
-                
+            cell=mainRow.createCell(colCnt);cell.setCellValue(appL.getApplicationName());
+            columnCount=3;
+            for(ApplicationLicenseRange appR:appL.getAppLicenseRange()){
+                cell=mainRow.createCell(columnCount);cell.setCellValue(appR.getEumCount());
+                columnCount++;
             }
             
-            if(count > 0){ row++;}
-
+            for(EUMPageLicenseCount epl:appL.getEumPages()){
+                row++;
+                mainRow = curSheet.createRow(row);
+                cell=mainRow.createCell(2);cell.setCellValue(epl.getPageName());
+                columnCount=3;
+                for(EUMPageLicenseRange epr:epl.getPageLicenseRange()){
+                    cell=mainRow.createCell(columnCount);cell.setCellValue(epr.getValue());
+                    columnCount++;
+                }
+            }
         }
         
         
