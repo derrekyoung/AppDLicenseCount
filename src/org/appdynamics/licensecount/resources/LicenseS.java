@@ -66,6 +66,7 @@ public class LicenseS extends OPTS{
     public static final String AGENT_NAME_NODEJS="NodeJS Agent";
     public static final String AGENT_NAME_DOTNET="DotNet Agent";
     public static final String AGENT_NAME_MACHINE_AGENT="Machine Agent";
+    public static final String AGENT_NAME_DB_AGENT="DB Agent";
     public static final String NONE="None";
     public static final String PRESENT="Present";
     public static final String DESCRIPTION="Description";

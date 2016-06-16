@@ -115,6 +115,9 @@ public class LicenseCount {
             case 7:
                 val=s.AGENT_NAME_C_SDK;
                 break;
+            case 8:
+                val=LicenseS.AGENT_NAME_DB_AGENT;
+                break;
             default:
                 break;
         }

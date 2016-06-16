@@ -179,88 +179,6 @@ public class TierLicenseCount extends LicenseCount{
     }
     
     
-    //0:Java, 1:IIS, 2:PHP, 3:NodeJS, 4 Machine Agent
-    public void countNodeLicenses(ArrayList<TimeRange> timeRanges,
-            HashMap<String,ArrayList<Node>> dotNetMap, ArrayList<String> dotNetKeys){
-        
-   
-        logger.log(Level.INFO,new StringBuilder().append("Starting tier level license count for tier ").append(name).toString());
-        
-        for(NodeLicenseCount nodeL:nodeLicenseCount){
-            nodeL.countNodeLicenseRange(s.percentageThreshold);  
-        } 
-        
-        for(int i=0; i < timeRanges.size(); i++){
-            TierLicenseRange tRange = new TierLicenseRange();
-            tRange.setStart(timeRanges.get(i).getStart());
-            tRange.setEnd(timeRanges.get(i).getEnd());
-            tRange.setName(tRange.createName());
-            HashMap<String,ArrayList<Node>> dotNetMapTemp=new HashMap<String,ArrayList<Node>>(dotNetMap);
-            ArrayList<String> foundDotNet=new ArrayList<String>();
-            for(NodeLicenseCount node:nodeLicenseCount){
-                if(node.getRangeValues().size() > i && node.getRangeValues().get(i).isCountAsLicense()){
-                    if(s.debugLevel >= 2)   logger.log(Level.INFO,new StringBuilder().append("\t\tCounting node type ").append(node.getType()).toString());
-                    switch(node.getType()){
-                        case 1:
-                            //We don't do anything for now, this is will be added up later.
-                            //logger.log(Level.INFO,"Adding DotNet " + node.getLicWeight());
-                            
-                            StringBuilder bud = new StringBuilder();
-                            bud.append("\n\tAdding .Net node ").append(node.getNode().getName()).append("\n\tiisCount orig value ").append(tRange.iisCount);
-                            if(dotNetMapTemp.containsKey(node.getMachineName()) 
-                                    && !foundDotNet.contains(node.getMachineName())
-                                    && ! dotNetKeys.contains(getNodeKey(tRange,node.getMachineName()))){
-                                tRange.iisCount++;
-                                tRange.totalCount++;
-                                foundDotNet.add(node.getMachineName());//dotNetMapTemp.remove(node.getMachineName());
-                                dotNetKeys.add(getNodeKey(tRange,node.getMachineName()));
-                                bud.append("\n----------------------------------------\n start:").append(tRange.getStart()).append(" -- ").append(tRange.getEnd());
-                                bud.append(" :: ").append(node.getNode().getTierName());
-                            }
-                            bud.append(" and iisInternalCount orig value ").append(tRange.iisInternalCount);
-                            tRange.iisInternalCount++;
-                            bud.append("\n\tiisCount new value ").append(tRange.iisCount).append(" and iisInternalCount new value ").append(tRange.iisInternalCount);
-
-                            
-                            break;
-                        case 2:
-                            //We don't do anything for now, this will be added up later
-                            //logger.log(Level.INFO,"Adding PHP " + node.getLicWeight());
-                            tRange.phpCount++;//=node.getLicWeight();
-                            tRange.totalCount++;//=node.getLicWeight();
-                            break;
-
-                        case 3:
-                            tRange.nodeJSCount++;
-                            tRange.totalCount++;
-                            break;
-                        case 4:
-                            tRange.machineCount++;
-                            tRange.totalCount++;
-                            break;
-                        case 6:
-                            tRange.webserverCount++;
-                            tRange.totalCount++;
-                            break;
-                        case 7:
-                            tRange.nativeSDKCount++;
-                            tRange.totalCount++;
-                            break;
-                        default:
-                            tRange.javaCount++;
-                            tRange.totalCount++;
-                            break;
-                    }
-                    
-                }
-            }
-            tierLicenseRange.add(tRange);
-        }
-        
-
-    }
-   
-    
     public ArrayList<TierLicenseRange> getTierLicenseRange() {
         return tierLicenseRange;
     }
@@ -269,15 +187,7 @@ public class TierLicenseCount extends LicenseCount{
         this.tierLicenseRange = tierLicenseRange;
     }
 
-    /*
-    public TierLicenseRange getTotalRangeValue() {
-        return totalRangeValue;
-    }
 
-    public void setTotalRangeValue(TierLicenseRange totalRangeValue) {
-        this.totalRangeValue = totalRangeValue;
-    }
-*/
     public ArrayList<TierHourLicenseRange> getTierHourLicenseRange() {
         return tierHourLicenseRange;
     }

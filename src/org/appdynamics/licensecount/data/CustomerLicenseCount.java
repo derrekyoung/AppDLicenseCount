@@ -95,50 +95,7 @@ public class CustomerLicenseCount extends LicenseCount{
         
         CountAgents cntAgents = new CountAgents();
         cntAgents.countCustomerLicenses(this, dotNetMap);
-        
-        /*
-        for(int i=0; i < timeRanges.size(); i++){
-            CustomerLicenseRange aRange = new CustomerLicenseRange();
-            aRange.setStart(timeRanges.get(i).getStart());
-            aRange.setEnd(timeRanges.get(i).getEnd());
-            aRange.setName(aRange.createName());
-            
-            for(ApplicationLicenseCount tCount:applications.values()){
-                TierLicenseRange tRange= tCount.getAppLicenseRange().get(i);
-                aRange.iisCount+=tRange.getIisCount();
-                aRange.javaCount+=tRange.getJavaCount();
-                aRange.nodeJSCount+=tRange.getNodeJSCount();
-                aRange.machineCount+=tRange.getMachineCount();
-                aRange.phpCount+=tRange.getPhpCount();
-                aRange.totalCount+=tRange.getTotalCount();
-                aRange.iisInternalCount+=tRange.getIisInternalCount();
-                aRange.webserverCount+=tRange.getWebserverCount();
-                aRange.nativeSDKCount+=tRange.getNativeSDKCount();
                 
-            }
-            //logger.log(Level.INFO, "Value of iisCount " + aRange.iisCount);
-            // We need to round the license up.
-            aRange.iisCount=licenseRound(aRange.iisCount);
-            aRange.totalCount=licenseRound(aRange.totalCount);
-            if(aRange.nodeJSCount > 0)
-                aRange.totalCount=licenseRound(aRange.iisCount)+licenseRound(aRange.getNodeJSCount()/10)+aRange.phpCount+aRange.getJavaCount()+aRange.getMachineCount()+aRange.getWebserverCount();
-            customerRangeValues.add(aRange);
-        }
-        
-        for(CustomerLicenseRange tRange:customerRangeValues){
-            totalRangeValue.iisCount+=tRange.iisCount;
-            totalRangeValue.javaCount+=tRange.javaCount;
-            totalRangeValue.phpCount+=tRange.phpCount;
-            totalRangeValue.nodeJSCount+=tRange.nodeJSCount;
-            totalRangeValue.machineCount+=tRange.machineCount;
-            totalRangeValue.totalCount+=tRange.totalCount;
-            totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
-            totalRangeValue.webserverCount+=tRange.webserverCount;
-            totalRangeValue.nativeSDKCount+=tRange.nativeSDKCount;
-        }
-        
-        */
-        
     }
 
     public static Logger getLogger() {
