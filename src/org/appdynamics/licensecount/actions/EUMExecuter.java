@@ -99,7 +99,7 @@ public class EUMExecuter implements Runnable{
         MetricValues val = null;
         if(myInterval < 8){
 	    // How is this different ?
-            TimeRange t = TimeRangeHelper.getTimeRange(myInterval);
+            TimeRange t = TimeRangeHelper.getSingleTimeRange(myInterval);
             MetricDatas mDatas= access.getRESTEUMMetricQuery(22, appName, pageLic.getPageName(), t.getStart(), t.getEnd());
             if(mDatas != null && !mDatas.hasNoValues()) {
                 return mDatas.getMetric_data().get(0).getMetricValues().get(0);

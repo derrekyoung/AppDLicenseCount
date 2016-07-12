@@ -106,7 +106,7 @@ public class NodeExecutor implements Runnable{
         MetricValues val = null;
         if(myInterval < 8){
 		// 
-            TimeRange t = TimeRangeHelper.getTimeRange(myInterval);
+            TimeRange t = TimeRangeHelper.getSingleTimeRange(myInterval);
             //access.getRESTMetricQuery(nodeLic.getQueryType(), appName, nodeLic.getNode().getTierName(), nodeLic.getNode().getName(),            totalTimeRange.getStart(), totalTimeRange.getEnd());
             MetricDatas mDatas= access.getRESTMetricQuery(nodeLic.getQueryType(), appName, nodeLic.getNode().getTierName(), nodeLic.getNode().getName(), t.getStart(), nodeLic.getTotalRangeValue().getEnd());
             if(mDatas != null && !mDatas.hasNoValues()) {
