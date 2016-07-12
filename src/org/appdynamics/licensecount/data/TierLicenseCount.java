@@ -5,15 +5,13 @@
 package org.appdynamics.licensecount.data;
 
 import org.appdynamics.licensecount.actions.*;
+import org.appdynamics.licensecount.resources.LicenseS;
 import org.appdynamics.appdrestapi.RESTAccess;
 import org.appdynamics.appdrestapi.data.*;
+import org.appdynamics.appdrestapi.resources.s;
 import org.appdynamics.appdrestapi.util.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import org.appdynamics.appdrestapi.resources.s;
-
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -125,6 +123,9 @@ public class TierLicenseCount extends LicenseCount{
         if(s.debugLevel >= 2) 
             logger.log(Level.INFO,new StringBuilder().append("Populating tier ").append(name).append(" license count for application ").append(applicationName).toString());
         
+        MetricDatas tierAppAgents=access.getRESTMetricQuery(0, applicationName, name, totalTimeRange.getStart(), totalTimeRange.getEnd());
+        MetricDatas tierMachineAgents=access.getRESTMetricQuery(1, applicationName, name, totalTimeRange.getStart(), totalTimeRange.getEnd());
+        
         //totalRangeValue=new TierLicenseRange("Tier Total Count");
         //totalRangeValue.setStart(totalTimeRange.getStart());totalRangeValue.setEnd(totalTimeRange.getEnd());
         
@@ -132,7 +133,9 @@ public class TierLicenseCount extends LicenseCount{
          * This is going to get the nodes to count all of the licenses.
          * 
          * This is a good point to thread out
-         */
+        
+        Instead of asking on a per node, lets grab the tier level information.
+         
         ThreadExecutor execNodes = new ThreadExecutor(8);
         
         for(NodeLicenseCount nodeL:nodeLicenseCount){
@@ -145,30 +148,28 @@ public class TierLicenseCount extends LicenseCount{
         }
         execNodes.getExecutor().shutdown();
         execNodes.shutdown();
+        */
+
         
-        MetricDatas tierAppAgents=access.getRESTMetricQuery(0, applicationName, name, totalTimeRange.getStart(), totalTimeRange.getEnd());
-        MetricDatas tierMachineAgents=access.getRESTMetricQuery(1, applicationName, name, totalTimeRange.getStart(), totalTimeRange.getEnd());
         
-        //This call doesn't do anything --delete
-        getMetricValues(tierAppAgents).getMetricValue();
-        
-        // This is serial
-        ArrayList<TimeRange> hourlyTimeRanges=TimeRangeHelper.getHourlyTimeRanges(totalTimeRange.getStart(), totalTimeRange.getEnd());
-        for(TimeRange hourRange: hourlyTimeRanges){
-            TierHourLicenseRange tr=new TierHourLicenseRange(hourRange);
-            tr.createName();
-            
-            for(MetricValue mv:getMetricValues(tierAppAgents).getMetricValue()){
-                if(tr.withIn(mv.getStartTimeInMillis())) tr.getAppMetricValues().getMetricValue().add(mv);
+        // This is going to get the hourly values but we need to be type 0, otherwise it will not work
+        if(LicenseS.TYPE_V == 0){
+            ArrayList<TimeRange> hourlyTimeRanges=TimeRangeHelper.getHourlyTimeRanges(totalTimeRange.getStart(), totalTimeRange.getEnd());
+            for(TimeRange hourRange: hourlyTimeRanges){
+                TierHourLicenseRange tr=new TierHourLicenseRange(hourRange);
+                tr.createName();
+
+                for(MetricValue mv:getMetricValues(tierAppAgents).getMetricValue()){
+                    if(tr.withIn(mv.getStartTimeInMillis())) tr.getAppMetricValues().getMetricValue().add(mv);
+                }
+
+                for(MetricValue mv:getMetricValues(tierMachineAgents).getMetricValue()){
+                    if(tr.withIn(mv.getStartTimeInMillis())) tr.getMachineMetricValues().getMetricValue().add(mv);
+                }
+                tr.countAgents();
+                tierHourLicenseRange.add(tr);
             }
-            
-            for(MetricValue mv:getMetricValues(tierMachineAgents).getMetricValue()){
-                if(tr.withIn(mv.getStartTimeInMillis())) tr.getMachineMetricValues().getMetricValue().add(mv);
-            }
-            tr.countAgents();
-            tierHourLicenseRange.add(tr);
         }
-        
         
     }
     

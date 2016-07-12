@@ -99,11 +99,18 @@ public class ApplicationLicenseCount extends LicenseCount{
          * Now that we have all of the nodes we are going to get all of the tiers to count
          * the nodes. 
         */
+        
+        ThreadExecutor execTiers = new ThreadExecutor(8);
+        
         for(TierLicenseCount tCount: tierLicenses.values()){
-            tCount.populateNodeLicenseRange(totalTimeRange, listOfTimes, access, applicationName);
+            
+            // tCount.populateNodeLicenseRange(totalTimeRange, listOfTimes, access, applicationName);
+            TierExecutor tierExec = new TierExecutor(tCount, access, applicationName, totalTimeRange, listOfTimes);
+            execTiers.getExecutor().execute(tierExec);
         }
         
-        
+        execTiers.getExecutor().shutdown();
+        execTiers.shutdown();
         
         /*
             This is going to be captured the EUM data

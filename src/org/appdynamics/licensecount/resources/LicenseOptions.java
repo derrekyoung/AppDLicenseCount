@@ -93,6 +93,12 @@ public class LicenseOptions {
                                 .create( LicenseS.INTERVAL_S );
         options.addOption(interval);
         
+        Option type = OptionBuilder.withLongOpt(LicenseS.TYPE_L).withArgName( LicenseS.TYPE_S )
+                                .hasArg()
+                                .withDescription( LicenseS.TYPE_D )
+                                .create( LicenseS.TYPE_S );
+        options.addOption(type);
+        
         Option uptime = OptionBuilder.withLongOpt(LicenseS.UPTIME_L).withArgName( LicenseS.UPTIME_S )
                                 .hasArg()
                                 .withDescription( LicenseS.UPTIME_D )
@@ -251,8 +257,15 @@ public class LicenseOptions {
         return -1.0;
     }
     
-    public boolean validInterval(int interval){
-        if(interval > 0 && interval < 36) return true;
+    public boolean validInterval(){
+        if( LicenseS.TYPE_V == 0 ) {
+                if(LicenseS.INTERVAL_V > 0 && LicenseS.INTERVAL_V < 36) return true;
+        }else{
+                if(LicenseS.INTERVAL_V > 0 && LicenseS.INTERVAL_V <= 360) return true;
+        }
+        logger.log(Level.SEVERE, new StringBuilder()
+                .append("The license interval provide is invalid, for a daily run it must be between 1 and 35 days. For a minute run, it must be between 0 and 360 minutes")
+                    .toString()); 
         return false;
     }
     

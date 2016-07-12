@@ -26,6 +26,13 @@ public class OPTS {
     public static final boolean FILENAME_A=true;
     public static String FILENAME_V="Customer1";
     
+    public static final String TYPE_L="type";
+    public static final String TYPE_S="t";
+    public static final String TYPE_D="Optional : This is going to decide whether to do a daily or minute report. Default is going to be 0 for a daily.  ";
+    public static final boolean TYPE_R=false;
+    public static final boolean TYPE_A=true;
+    public static int TYPE_V=0;
+    
     public static final String INTERVAL_L="interval";
     public static final String INTERVAL_S="i";
     public static final String INTERVAL_D="Optional : This is going to be the number of days we go back and run. Default is going back 7 days from midnight to midnight.  ";
