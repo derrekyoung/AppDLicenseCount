@@ -138,7 +138,7 @@ public class LicenseCount {
     public int getAgentTypeFromVersion(String version, String type){
         if(version.contains(s.AGENT_TYPE_CHK_PHP)){return 2;}
         if(type.contains(s.AGENT_TYPE_CHK_IIS) || version.contains(s.AGENT_TYPE_CHK_IIS)){return 1;}
-        if(version.contains(s.AGENT_TYPE_CHK_NODEJS)){return 3;}
+        if(type.contains(LicenseS.NODE_AGENT_TYPE)){return 3;}
         if(type.contains(LicenseS.AGENT_TYPE_OTHER)){return 5;} // This might be Java or PHP
         return 0;
     }
@@ -148,7 +148,7 @@ public class LicenseCount {
         if(aType.contains(s.AGENT_TYPE_WEB_SERVER)){return 6;}
         if(version.contains(s.AGENT_TYPE_CHK_PHP)){return 2;}
         if(type.contains(s.AGENT_TYPE_CHK_IIS) || version.contains(s.AGENT_TYPE_CHK_IIS)){return 1;}
-        if(version.contains(s.AGENT_TYPE_CHK_NODEJS)){return 3;}
+        if(aType.contains(LicenseS.NODE_AGENT_TYPE)){return 3;}
         if(type.contains(LicenseS.AGENT_TYPE_OTHER)){return 5;} // This might be Java or PHP
         return 0;
     }

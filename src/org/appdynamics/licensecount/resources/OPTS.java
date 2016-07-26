@@ -9,6 +9,30 @@ import java.util.ArrayList;
 /**
  *
  * @author gilbert.solorzano
+ * 
+ *  -v | --version
+ *  -f  | --file
+ *  -t  | --type
+ *  -i  | --interval
+ *  -I | --longInterval
+ *  -C | --config
+ *  -U | --uptime
+ *  -A | --apps
+ *  -n | --now
+ *  -N | --node
+ *  -L | --logfile
+ *  -g | --groupfile
+ *  -c | --controller
+ *  -P | --port
+ *  -a | --account
+ *  -u | --user
+ *  -p | --passwd
+ *  -s | --ssl
+ *  -G | --granular
+ * 
+ *  -E | --eum
+ *  -D | --dbs
+ * 
  */
 public class OPTS {
     
@@ -39,6 +63,13 @@ public class OPTS {
     public static final boolean INTERVAL_R=false;
     public static final boolean INTERVAL_A=true;
     public static int INTERVAL_V=7;
+    
+    public static final String LINTERVAL_L="longInterval";
+    public static final String LINTERVAL_S="I";
+    public static final String LINTERVAL_D="Optional : This is used when the report is going to be beyond 30 days but up to 365 days only.  ";
+    public static final boolean LINTERVAL_R=false;
+    public static final boolean LINTERVAL_A=false;
+    public static boolean LINTERVAL_V=false;
     
     public static final String CFG_FILE_L="config";
     public static final String CFG_FILE_S="C";

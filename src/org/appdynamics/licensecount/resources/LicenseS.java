@@ -59,6 +59,7 @@ public class LicenseS extends OPTS{
     public static final String NATIVE_SDK_AGENT_COUNT="Native SDK Agent Count";
     public static final String MACHINE_AGENT_COUNT="Machine Agent Count";
     public static final String APPLICATION_AGENT_COUNT="Application Agent Count";
+    public static final String NODE_AGENT_TYPE="NODEJS_APP_AGENT";
     
     public static final String AGENT_TYPE_CHK_PHP="PHP";
     public static final String AGENT_TYPE_CHK_IIS="IIS";

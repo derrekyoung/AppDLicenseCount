@@ -13,6 +13,7 @@ import org.appdynamics.appdrestapi.util.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 
 import java.util.logging.Logger;
@@ -56,6 +57,11 @@ public class ApplicationLicenseCount extends LicenseCount{
             TimeRange totalTimeRange){
         // In this scenario we are going to zero out the minutes, seconds, hours of 
         //ArrayList<LicenseRange> listOfTimes=getTimeRange(interval);
+        if(nodes == null){ 
+            logger.log(Level.SEVERE,new StringBuilder().append("The node query for application ").append(applicationName).append(" did not return any nodes.").toString());
+            return;
+        }
+        
         if(s.debugLevel >= 2) 
             logger.log(Level.INFO,new StringBuilder().append("Application ").append(applicationName).append(" has ").append(nodes.getNodes().size()).append(" nodes.").toString());
         
@@ -65,34 +71,39 @@ public class ApplicationLicenseCount extends LicenseCount{
         
         
         //If just in case we don't have any nodes
-        if(nodes == null) return;
         
-        
+        Tiers tiers = access.getTiersForApplication(applicationId);
+        if(tiers == null){ 
+            logger.log(Level.SEVERE,new StringBuilder().append("The tier query for application ").append(applicationName).append(" did not return any tiers.").toString());
+            return;
+        }
+            
         /*
-         *  First we are going to get all of the nodes, then match them with their tier.
+            We are going to create all of the tier
         */
+        for(Tier tier:tiers.getTiers()){
+            tierLicenses.put(tier.getId(),new TierLicenseCount(tier));
+        }
+        
         for(Node node:nodes.getNodes()){
-            if(!tierLicenses.containsKey(node.getTierId()))
-                tierLicenses.put(node.getTierId(), new TierLicenseCount(node.getTierName()));
-            
-            
             //This is going to create the NodeLicense and return it.
             //NodeLicenseCount nodeL=tierLicenses.get(node.getTierId()).addNodeRange(node);
             tierLicenses.get(node.getTierId()).addNodeRange(node); 
         }
         
-        
-        Tiers tiers = access.getTiersForApplication(applicationId);
-        if(tiers != null){
-            for(Tier tier:tiers.getTiers()){
-                if(tierLicenses.containsKey(tier.getId())){
-                    tierLicenses.get(tier.getId()).setTierId(tier.getId());
-                    tierLicenses.get(tier.getId()).setTierAgentType(tier.getAgentType());
-                }else{
-                    tierLicensesNoNodes.put(tier.getId(), tier);
-                }
+        /*
+         This is where we clean up any tiers that don't have nodes
+        */
+        Iterator<Integer> tierIt=tierLicenses.keySet().iterator();
+        while(tierIt.hasNext()){
+            Integer id = tierIt.next();
+            if(tierLicenses.get(id).getNodeLicenseCount().isEmpty()){
+                tierLicensesNoNodes.put(id, tierLicenses.get(id).getTier());
+                //tierLicenses.remove(id);
+                tierIt.remove();
             }
         }
+        
         
         
         /*
@@ -100,7 +111,7 @@ public class ApplicationLicenseCount extends LicenseCount{
          * the nodes. 
         */
         
-        ThreadExecutor execTiers = new ThreadExecutor(8);
+        ThreadExecutor execTiers = new ThreadExecutor(5);
         
         for(TierLicenseCount tCount: tierLicenses.values()){
             

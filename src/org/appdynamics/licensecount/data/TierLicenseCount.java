@@ -28,9 +28,9 @@ import java.util.logging.Level;
 public class TierLicenseCount extends LicenseCount{
     private static Logger logger=Logger.getLogger(TierLicenseCount.class.getName());
     private String name;
-    private String tierAgentType;
-    private int tierId;
+    private Tier  tier;
     private int nodeCount=0;
+    
 
     private ArrayList<NodeLicenseCount> nodeLicenseCount=new ArrayList<NodeLicenseCount>();
     private ArrayList<TierLicenseRange> tierLicenseRange=new ArrayList<TierLicenseRange>();
@@ -39,18 +39,16 @@ public class TierLicenseCount extends LicenseCount{
     
     public TierLicenseCount(){super();}
     
-    public TierLicenseCount(String name){super();this.name=name;}
     
-    public TierLicenseCount(String name, String tierType, int id){
+    public TierLicenseCount(Tier tier){
         super();
-        this.name=name;
-        this.tierAgentType=tierType;
-        this.tierId=id;
+        this.name=tier.getName();
+        this.tier=tier;
     }
     
     public void addNode(Node node){
         nodeCount++;
-        nodeLicenseCount.add(new NodeLicenseCount(node));
+        nodeLicenseCount.add(new NodeLicenseCount(node,this));
     }
     
     // We return the node so that we can work with it.
@@ -58,17 +56,27 @@ public class TierLicenseCount extends LicenseCount{
         
         NodeLicenseCount nodeL=null;
         try{
-            nodeL=new NodeLicenseCount(node);
+            nodeL=new NodeLicenseCount(node,this);
             nodeCount++;
             nodeLicenseCount.add(nodeL);
         }catch(Exception e){
             StringBuilder bud =new StringBuilder();
-            bud.append("Exception occurred while attempting to get node information for ").append(node.toString()).append("\n\t\tNode will not be counted.");
+            bud.append("Exception occurred while attempting to get node information for tier ").append(tier.getAgentType())
+                    .append("\n for node: ").append(node.toString()).append("\n\t\tNode will not be counted.");
             logger.log(Level.SEVERE, bud.toString());
         }    
         return nodeL;
     }
 
+    public Tier getTier() {
+        return tier;
+    }
+
+    public void setTier(Tier tier) {
+        this.tier = tier;
+    }
+
+    
     public String getName() {
         return name;
     }
@@ -93,21 +101,6 @@ public class TierLicenseCount extends LicenseCount{
         this.nodeLicenseCount = nodeLicenseCount;
     }
 
-    public String getTierAgentType() {
-        return tierAgentType;
-    }
-
-    public void setTierAgentType(String tierAgentType) {
-        this.tierAgentType = tierAgentType;
-    }
-
-    public int getTierId() {
-        return tierId;
-    }
-
-    public void setTierId(int tierId) {
-        this.tierId = tierId;
-    }
     
     
     

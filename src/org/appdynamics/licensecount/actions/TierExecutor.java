@@ -10,13 +10,13 @@ import org.appdynamics.licensecount.data.NodeLicenseRange;
 import org.appdynamics.licensecount.resources.LicenseS;
 import org.appdynamics.appdrestapi.RESTAccess;
 import org.appdynamics.appdrestapi.data.*;
-import org.appdynamics.appdrestapi.util.TimeRange;
+import org.appdynamics.appdrestapi.util.*;
 
 
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.appdynamics.appdrestapi.util.TimeRangeHelper;
+
 /**
  *
  * @author gilbert.solorzano
@@ -106,6 +106,7 @@ public class TierExecutor implements Runnable{
                 //nlc.getTotalRangeValue().setMetricValues(app.getFirstMetricValues()); // This will get the metrics for the app agent
                 //nlc.getTotalRangeValue().setMachineMetricValues(mach.getFirstMetricValues()); // We need to check for nulls
                 nlc.getTotalRangeValue().setMetricValues( getMetricData(app,nlc.getName()).getFirstMetricValues()); // This will get the metrics for the app agent
+                
                 nlc.getTotalRangeValue().setMachineMetricValues(getMetricData(mach,nlc.getName()).getFirstMetricValues() ); // We need to check for nulls
                 for(TimeRange tRange:timeRanges){
                         NodeLicenseRange nodeR = new NodeLicenseRange();
@@ -183,9 +184,10 @@ public class TierExecutor implements Runnable{
             }
         }else{
             // We are going to start to select the metrics 
-             TimeRange t = TimeRangeHelper.getTimeRange(myInterval,5);
+             TimeRange t = TimeRangeHelper.getSingleTimeRange(myInterval,5);
              MetricDatas val1;
              // First we are going to grab the first set of metrics
+             // logger.log(Level.INFO,new StringBuilder().append("Asking for ").append(t.getStart()).append(" and ").append(t.getEnd()).toString());
              val= access.getRESTMetricQuery(queryIndex, appName,  tierLic.getName(), "*", t.getStart(), t.getEnd());
                 if(val != null && !val.hasNoValues()) {
             

@@ -42,28 +42,45 @@ public class NodeLicenseCount extends LicenseCount{
     private Node node;
     private ArrayList<NodeLicenseRange> rangeValues=new ArrayList<NodeLicenseRange>();
     private NodeLicenseRange totalRangeValue;
+    private TierLicenseCount parent;
     private double licWeight=0;
     
     @SuppressWarnings("OverridableMethodCallInConstructor")
-    public NodeLicenseCount(Node node){
+    public NodeLicenseCount(Node node, TierLicenseCount parent){
         super();
+        this.parent=parent;
         this.node=node;
         this.setInformation();
     }
     
+    /*
+        The logic has just been changed to get the type of agent that we have.
+    */
     public void setInformation(){
         totalRangeValue=new NodeLicenseRange("Total Node Count");
 
+        if(s.debugLevel >= 2) 
+            logger.log(Level.INFO,new StringBuilder().append("\t\tNode ").append(node.getName()).append(" App Agent version  ")
+                    .append(node.getAppAgentVersion()).append(", Type ").append(node.getType()).append(", Agent Type ").append(node.getAgentType()).toString());
+        
+        boolean notFnd=true;
         if(node.isMachineAgentPresent() && !node.isAppAgentPresent()){
             type=4;
             queryType=1;
-        }else{
-            if(node.getAgentType() != null && !node.getAgentType().equalsIgnoreCase("")){
+            notFnd=false;
+        }
+        if(notFnd && checkIfWebServer(parent.getTier().getAgentType())){setType(6);notFnd=false;}
+        if(notFnd && checkIfPHP(parent.getTier().getAgentType())){ setType(2);notFnd=false;}
+        if(notFnd && checkIfNodeJs(parent.getTier().getAgentType())){ setType(3);notFnd=false;}
+        if(notFnd && checkIfDotNet(parent.getTier().getAgentType())){setType(1);notFnd=false;}
+        if(notFnd){
+            if(node.getAgentType() != null ){
                 type=getAgentTypeFromVersion(node.getAppAgentVersion(),node.getType(),node.getAgentType());
             }else{
                 type=getAgentTypeFromVersion(node.getAppAgentVersion(),node.getType());
             }
         }
+
         if(s.debugLevel >= 2) 
             logger.log(Level.INFO,new StringBuilder().append("\t\tNode ").append(node.getName()).append(" type ID is  ").append(type).append(", type name is ").append(node.getType()).toString());
         
