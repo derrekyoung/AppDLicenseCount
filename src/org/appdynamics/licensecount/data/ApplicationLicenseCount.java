@@ -13,6 +13,7 @@ import org.appdynamics.appdrestapi.util.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 
 import java.util.logging.Logger;
@@ -56,6 +57,11 @@ public class ApplicationLicenseCount extends LicenseCount{
             TimeRange totalTimeRange){
         // In this scenario we are going to zero out the minutes, seconds, hours of 
         //ArrayList<LicenseRange> listOfTimes=getTimeRange(interval);
+        if(nodes == null){ 
+            logger.log(Level.SEVERE,new StringBuilder().append("The node query for application ").append(applicationName).append(" did not return any nodes.").toString());
+            return;
+        }
+        
         if(s.debugLevel >= 2) 
             logger.log(Level.INFO,new StringBuilder().append("Application ").append(applicationName).append(" has ").append(nodes.getNodes().size()).append(" nodes.").toString());
         
@@ -65,45 +71,57 @@ public class ApplicationLicenseCount extends LicenseCount{
         
         
         //If just in case we don't have any nodes
-        if(nodes == null) return;
         
-        
+        Tiers tiers = access.getTiersForApplication(applicationId);
+        if(tiers == null){ 
+            logger.log(Level.SEVERE,new StringBuilder().append("The tier query for application ").append(applicationName).append(" did not return any tiers.").toString());
+            return;
+        }
+            
         /*
-         *  First we are going to get all of the nodes, then match them with their tier.
+            We are going to create all of the tier
         */
+        for(Tier tier:tiers.getTiers()){
+            tierLicenses.put(tier.getId(),new TierLicenseCount(tier));
+        }
+        
         for(Node node:nodes.getNodes()){
-            if(!tierLicenses.containsKey(node.getTierId()))
-                tierLicenses.put(node.getTierId(), new TierLicenseCount(node.getTierName()));
-            
-            
             //This is going to create the NodeLicense and return it.
             //NodeLicenseCount nodeL=tierLicenses.get(node.getTierId()).addNodeRange(node);
             tierLicenses.get(node.getTierId()).addNodeRange(node); 
         }
         
-        
-        Tiers tiers = access.getTiersForApplication(applicationId);
-        if(tiers != null){
-            for(Tier tier:tiers.getTiers()){
-                if(tierLicenses.containsKey(tier.getId())){
-                    tierLicenses.get(tier.getId()).setTierId(tier.getId());
-                    tierLicenses.get(tier.getId()).setTierAgentType(tier.getAgentType());
-                }else{
-                    tierLicensesNoNodes.put(tier.getId(), tier);
-                }
+        /*
+         This is where we clean up any tiers that don't have nodes
+        */
+        Iterator<Integer> tierIt=tierLicenses.keySet().iterator();
+        while(tierIt.hasNext()){
+            Integer id = tierIt.next();
+            if(tierLicenses.get(id).getNodeLicenseCount().isEmpty()){
+                tierLicensesNoNodes.put(id, tierLicenses.get(id).getTier());
+                //tierLicenses.remove(id);
+                tierIt.remove();
             }
         }
+        
         
         
         /*
          * Now that we have all of the nodes we are going to get all of the tiers to count
          * the nodes. 
         */
+        
+        ThreadExecutor execTiers = new ThreadExecutor(5);
+        
         for(TierLicenseCount tCount: tierLicenses.values()){
-            tCount.populateNodeLicenseRange(totalTimeRange, listOfTimes, access, applicationName);
+            
+            // tCount.populateNodeLicenseRange(totalTimeRange, listOfTimes, access, applicationName);
+            TierExecutor tierExec = new TierExecutor(tCount, access, applicationName, totalTimeRange, listOfTimes);
+            execTiers.getExecutor().execute(tierExec);
         }
         
-        
+        execTiers.getExecutor().shutdown();
+        execTiers.shutdown();
         
         /*
             This is going to be captured the EUM data
@@ -144,95 +162,7 @@ public class ApplicationLicenseCount extends LicenseCount{
         
     }
 
-    
-    public void countTierLicenses(ArrayList<TimeRange> timeRanges){
-        if(s.debugLevel >= 2) 
-            logger.log(Level.INFO,new StringBuilder().append("Begin application level tier license count.").toString());
 
-        /*
-         * We have host with .Net agents that exist in multiple agents, we are going to get a map of all first.
-         */
-        populateDotNetMap();        
-        /*
-         * This is where we are going identify the countable agents
-         */
-        //logger.log(Level.INFO,"Starting the nodeLicense count.");
-        for(TierLicenseCount tCount: tierLicenses.values()){
-            tCount.countNodeLicenses(timeRanges,dotNetMap,dotNetKeys);
-        }
-        
-        if(LicenseS.EUM_V){
-           
-            for(EUMPageLicenseCount pageL:eumPages){
-                    pageL.countEUMPageLicenseRange();
-            }
-            
-        }
-        
-        for(int i=0; i < timeRanges.size(); i++){
-            ApplicationLicenseRange aRange = new ApplicationLicenseRange();
-            aRange.setStart(timeRanges.get(i).getStart());
-            aRange.setEnd(timeRanges.get(i).getEnd());
-            aRange.setName(aRange.createName());
-            
-            for(TierLicenseCount tCount:tierLicenses.values()){
-                TierLicenseRange tRange= tCount.getTierLicenseRange().get(i);
-                aRange.iisCount+=tRange.getIisCount();
-                aRange.javaCount+=tRange.getJavaCount();
-                aRange.nodeJSCount+=tRange.getNodeJSCount();
-                aRange.machineCount+=tRange.getMachineCount();
-                aRange.phpCount+=tRange.getPhpCount();
-                aRange.totalCount+=tRange.getTotalCount();
-                aRange.iisInternalCount+=tRange.iisInternalCount;
-                aRange.webserverCount+=tRange.webserverCount;
-                aRange.nativeSDKCount+=tRange.nativeSDKCount;
-                // This will insure that nodejs is properly counted.
-                
-            }
-            if(aRange.getNodeJSCount() > 0)  
-                    aRange.totalCount= (aRange.getTotalCount() - aRange.getNodeJSCount()) + licenseRound(aRange.getNodeJSCount()/10);
-            appLicenseRange.add(aRange);
-            
-            if(LicenseS.EUM_V){
-                for(EUMPageLicenseCount ep:eumPages){
-                    EUMPageLicenseRange er=ep.getPageLicenseRange().get(i);
-                    aRange.eumCount+=er.getValue();
-                }
-            }
-        }
-        
-        // This is going to get the tier counts:
-        ArrayList<TimeRange> hourlyTimeRanges=TimeRangeHelper.getHourlyTimeRanges(totalRangeValue.getStart(), totalRangeValue.getEnd());
-        for(int i = 0; i < hourlyTimeRanges.size(); i++){
-            AppHourLicenseRange app = new AppHourLicenseRange(hourlyTimeRanges.get(i));
-            for(TierLicenseCount tCount:tierLicenses.values()){
-                for(TierHourLicenseRange tRange: tCount.getTierHourLicenseRange()){
-                    if(app.withIn(tRange)){
-                        app.appAgent+=tRange.appAgent;
-                        app.machineAgent+=tRange.machineAgent;
-                    }
-                }
-            }
-            appHourLicenseRange.add(app);
-        }
-        
-        
-        for(ApplicationLicenseRange tRange:appLicenseRange){
-            totalRangeValue.iisCount+=tRange.iisCount;
-            totalRangeValue.javaCount+=tRange.javaCount;
-            totalRangeValue.phpCount+=tRange.phpCount;
-            totalRangeValue.nodeJSCount+=tRange.nodeJSCount;
-            totalRangeValue.machineCount+=tRange.machineCount;
-            totalRangeValue.totalCount+=tRange.totalCount;
-            totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
-            totalRangeValue.webserverCount+=tRange.webserverCount;
-            totalRangeValue.nativeSDKCount+=tRange.nativeSDKCount;
-            totalRangeValue.eumCount+=tRange.eumCount;
-        }
-        
-        
-        
-    }
 
     public ArrayList<EUMPageLicenseCount> getEumPages() {
         return eumPages;

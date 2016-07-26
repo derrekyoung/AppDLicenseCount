@@ -20,11 +20,8 @@ import org.appdynamics.appdrestapi.util.TimeRangeHelper;
 /**
  *
  * @author gilbert.solorzano
- * 
- * TimeRange totalTimeRange, ArrayList<TimeRange> timeRanges, RESTAccess access, 
-            String applicationName, String tierAgentType
- * 
  */
+
 public class NodeExecutor implements Runnable{
     
     private static Logger logger=Logger.getLogger(NodeExecutor.class.getName());
@@ -49,6 +46,24 @@ public class NodeExecutor implements Runnable{
         this.tierAgentType=tierAgentType;
         this.timeRanges=timeRanges;
         this.totalTimeRange=totalTimeRange;
+        
+        // This is going to run without the need for additional metrics.
+        
+        if(nodeLic.getType() == 5 && timeRanges.size() > 0){
+ 
+                if( nodeLic.checkIfNotJava(access, appName, timeRanges.get(0).getStart(), timeRanges.get(0).getEnd()) ){ 
+                    if(s.debugLevel >= 2) 
+                            logger.log(Level.INFO,new StringBuilder().append("\n\tIt is not java, agent type is ").append(tierAgentType).toString());
+                    boolean fnd=false;
+                    if(nodeLic.checkIfWebServer(tierAgentType)){nodeLic.setType(6);fnd=true;}
+                    if(!fnd && nodeLic.checkIfPHP(tierAgentType)){ nodeLic.setType(2);fnd=true;}
+                    if(!fnd && nodeLic.checkIfNodeJs(tierAgentType)){ nodeLic.setType(3);fnd=true;}
+                    if(!fnd && nodeLic.checkIfDotNet(tierAgentType)){nodeLic.setType(1);fnd=true;}
+                    if(!fnd)nodeLic.setType(2);
+                }else{
+                    nodeLic.setType(0);
+                }
+        }
     }
     
     @Override 
@@ -67,25 +82,9 @@ public class NodeExecutor implements Runnable{
         nodeLic.getTotalRangeValue().setMetricValues(nodeLic.getMetricValues(mDatas));
         //nodeLic.getTotalRangeValue().setMetricValues(getMetricValues(LicenseS.INTERVAL_V));
         
-        if(nodeLic.getType() == 5 && timeRanges.size() > 0){
- 
-                if( nodeLic.checkIfNotJava(access, appName, timeRanges.get(0).getStart(), timeRanges.get(0).getEnd()) ){ 
-                    if(s.debugLevel >= 2) 
-                            logger.log(Level.INFO,new StringBuilder().append("\n\tIt is not java, agent type is ").append(tierAgentType).toString());
-                    boolean fnd=false;
-                    if(nodeLic.checkIfWebServer(tierAgentType)){nodeLic.setType(6);fnd=true;}
-                    if(!fnd && nodeLic.checkIfPHP(tierAgentType)){ nodeLic.setType(2);fnd=true;}
-                    if(!fnd && nodeLic.checkIfNodeJs(tierAgentType)){ nodeLic.setType(3);fnd=true;}
-                    if(!fnd && nodeLic.checkIfDotNet(tierAgentType)){nodeLic.setType(1);fnd=true;}
-                    if(!fnd)nodeLic.setType(2);
-                }else{
-                    nodeLic.setType(0);
-                }
-        }
+        
         
         for(TimeRange tRange:timeRanges){
-            
-            
             NodeLicenseRange nodeR = new NodeLicenseRange();
             nodeR.setStart(tRange.getStart());nodeR.setEnd(tRange.getEnd());
             nodeR.setName(nodeR.createName());
@@ -105,7 +104,10 @@ public class NodeExecutor implements Runnable{
         int myInterval = valT;
         MetricValues val = null;
         if(myInterval < 8){
+<<<<<<< HEAD
 		// 
+=======
+>>>>>>> version_1.5.1
             TimeRange t = TimeRangeHelper.getSingleTimeRange(myInterval);
             //access.getRESTMetricQuery(nodeLic.getQueryType(), appName, nodeLic.getNode().getTierName(), nodeLic.getNode().getName(),            totalTimeRange.getStart(), totalTimeRange.getEnd());
             MetricDatas mDatas= access.getRESTMetricQuery(nodeLic.getQueryType(), appName, nodeLic.getNode().getTierName(), nodeLic.getNode().getName(), t.getStart(), nodeLic.getTotalRangeValue().getEnd());

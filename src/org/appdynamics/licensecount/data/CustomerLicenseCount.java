@@ -5,8 +5,9 @@
 package org.appdynamics.licensecount.data;
 
 import org.appdynamics.appdrestapi.RESTAccess;
+import org.appdynamics.appdrestapi.data.Node;
+import org.appdynamics.appdrestapi.util.TimeRangeHelper;
 import org.appdynamics.appdrestapi.resources.s;
-import org.appdynamics.licensecount.actions.ThreadExecutor;
 import org.appdynamics.licensecount.resources.LicenseS;
 
 import java.io.BufferedReader;
@@ -18,7 +19,6 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import org.appdynamics.appdrestapi.data.Node;
 
 /**
  *
@@ -39,12 +39,34 @@ public class CustomerLicenseCount extends LicenseCount{
     private ArrayList<org.appdynamics.appdrestapi.util.TimeRange> timeRanges=new ArrayList<org.appdynamics.appdrestapi.util.TimeRange>();
     private org.appdynamics.appdrestapi.util.TimeRange totalRange;
     
-    public CustomerLicenseCount(){super();}
+    public CustomerLicenseCount(){super();checkIfRESTAPI();}
     
-    public CustomerLicenseCount(String name){super();this.name=name;}
+    public CustomerLicenseCount(String name){super();this.name=name;checkIfRESTAPI();}
     
+    /*
+        public static final int VERSION_MAJOR=2;
+        public static final int VERSION_MINOR=5;
+        public static final int VERSION_BUILD=0;
+    
+        public static final int MIN_REST_MAJ_VER=2;
+        public static final int MIN_REST_MIN_VER=5;
+    */
+    public void checkIfRESTAPI(){
+        boolean valid=false;
+        if(s.VERSION_MAJOR >= LicenseS.MIN_REST_MAJ_VER 
+                && s.VERSION_MINOR >= LicenseS.MIN_REST_MIN_VER) valid=true;
+        
+        if(!valid) {
+            logger.log(Level.INFO,new StringBuilder()
+                    .append("The version of the AppDRESTAPI-SDK is older than expected at ")
+                    .append(s.RESTAPI_VERSION).append(". Minimum version is ").append(LicenseS.MIN_REST_MAJ_VER).append(".").append(LicenseS.MIN_REST_MIN_VER).append(".X").toString());
+            System.exit(1);
+        }
+    }
     
     public void addApplication(ApplicationLicenseCount app){
+        // Let's check to make sure we have the correct REST API version
+       
         if(s.debugLevel >= 2) 
             logger.log(Level.INFO,new StringBuilder().append("Adding application ").append(app.getApplicationName()).toString());
         applications.put(app.getApplicationId(),app);
@@ -53,15 +75,20 @@ public class CustomerLicenseCount extends LicenseCount{
     
     /*
      *  This function will start the population of the nodes and tiers across the app.
-     * 
+     *  type 0 is for daily.
      */
-    public void populateApplications(RESTAccess access,int interval){
+    public void populateApplications(RESTAccess access, int interval, int type){
         
         if(s.debugLevel >= 2) 
             logger.log(Level.INFO,new StringBuilder().append("Creating time range for interval ").append(interval).toString());
         // Should we make the total timer range an avg of usage?
-        timeRanges=getTimeRanges(interval);
-        totalRange=getTimeRange(interval);
+        if(type == 0){
+            timeRanges=TimeRangeHelper.getDailyTimeRanges(interval);
+            totalRange=TimeRangeHelper.getSingleTimeRange(interval);
+        }else{
+            timeRanges=TimeRangeHelper.getMinuteTimeRanges(interval);
+            totalRange=TimeRangeHelper.getSingleTimeRange(interval);
+        }
         
         
         totalRangeValue = new CustomerLicenseRange("Custumer Total");
@@ -95,50 +122,7 @@ public class CustomerLicenseCount extends LicenseCount{
         
         CountAgents cntAgents = new CountAgents();
         cntAgents.countCustomerLicenses(this, dotNetMap);
-        
-        /*
-        for(int i=0; i < timeRanges.size(); i++){
-            CustomerLicenseRange aRange = new CustomerLicenseRange();
-            aRange.setStart(timeRanges.get(i).getStart());
-            aRange.setEnd(timeRanges.get(i).getEnd());
-            aRange.setName(aRange.createName());
-            
-            for(ApplicationLicenseCount tCount:applications.values()){
-                TierLicenseRange tRange= tCount.getAppLicenseRange().get(i);
-                aRange.iisCount+=tRange.getIisCount();
-                aRange.javaCount+=tRange.getJavaCount();
-                aRange.nodeJSCount+=tRange.getNodeJSCount();
-                aRange.machineCount+=tRange.getMachineCount();
-                aRange.phpCount+=tRange.getPhpCount();
-                aRange.totalCount+=tRange.getTotalCount();
-                aRange.iisInternalCount+=tRange.getIisInternalCount();
-                aRange.webserverCount+=tRange.getWebserverCount();
-                aRange.nativeSDKCount+=tRange.getNativeSDKCount();
                 
-            }
-            //logger.log(Level.INFO, "Value of iisCount " + aRange.iisCount);
-            // We need to round the license up.
-            aRange.iisCount=licenseRound(aRange.iisCount);
-            aRange.totalCount=licenseRound(aRange.totalCount);
-            if(aRange.nodeJSCount > 0)
-                aRange.totalCount=licenseRound(aRange.iisCount)+licenseRound(aRange.getNodeJSCount()/10)+aRange.phpCount+aRange.getJavaCount()+aRange.getMachineCount()+aRange.getWebserverCount();
-            customerRangeValues.add(aRange);
-        }
-        
-        for(CustomerLicenseRange tRange:customerRangeValues){
-            totalRangeValue.iisCount+=tRange.iisCount;
-            totalRangeValue.javaCount+=tRange.javaCount;
-            totalRangeValue.phpCount+=tRange.phpCount;
-            totalRangeValue.nodeJSCount+=tRange.nodeJSCount;
-            totalRangeValue.machineCount+=tRange.machineCount;
-            totalRangeValue.totalCount+=tRange.totalCount;
-            totalRangeValue.iisInternalCount+=tRange.iisInternalCount;
-            totalRangeValue.webserverCount+=tRange.webserverCount;
-            totalRangeValue.nativeSDKCount+=tRange.nativeSDKCount;
-        }
-        
-        */
-        
     }
 
     public static Logger getLogger() {

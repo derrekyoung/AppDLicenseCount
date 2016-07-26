@@ -5,15 +5,13 @@
 package org.appdynamics.licensecount.data;
 
 import org.appdynamics.licensecount.actions.*;
+import org.appdynamics.licensecount.resources.LicenseS;
 import org.appdynamics.appdrestapi.RESTAccess;
 import org.appdynamics.appdrestapi.data.*;
+import org.appdynamics.appdrestapi.resources.s;
 import org.appdynamics.appdrestapi.util.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import org.appdynamics.appdrestapi.resources.s;
-
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -30,9 +28,9 @@ import java.util.logging.Level;
 public class TierLicenseCount extends LicenseCount{
     private static Logger logger=Logger.getLogger(TierLicenseCount.class.getName());
     private String name;
-    private String tierAgentType;
-    private int tierId;
+    private Tier  tier;
     private int nodeCount=0;
+    
 
     private ArrayList<NodeLicenseCount> nodeLicenseCount=new ArrayList<NodeLicenseCount>();
     private ArrayList<TierLicenseRange> tierLicenseRange=new ArrayList<TierLicenseRange>();
@@ -41,18 +39,16 @@ public class TierLicenseCount extends LicenseCount{
     
     public TierLicenseCount(){super();}
     
-    public TierLicenseCount(String name){super();this.name=name;}
     
-    public TierLicenseCount(String name, String tierType, int id){
+    public TierLicenseCount(Tier tier){
         super();
-        this.name=name;
-        this.tierAgentType=tierType;
-        this.tierId=id;
+        this.name=tier.getName();
+        this.tier=tier;
     }
     
     public void addNode(Node node){
         nodeCount++;
-        nodeLicenseCount.add(new NodeLicenseCount(node));
+        nodeLicenseCount.add(new NodeLicenseCount(node,this));
     }
     
     // We return the node so that we can work with it.
@@ -60,17 +56,27 @@ public class TierLicenseCount extends LicenseCount{
         
         NodeLicenseCount nodeL=null;
         try{
-            nodeL=new NodeLicenseCount(node);
+            nodeL=new NodeLicenseCount(node,this);
             nodeCount++;
             nodeLicenseCount.add(nodeL);
         }catch(Exception e){
             StringBuilder bud =new StringBuilder();
-            bud.append("Exception occurred while attempting to get node information for ").append(node.toString()).append("\n\t\tNode will not be counted.");
+            bud.append("Exception occurred while attempting to get node information for tier ").append(tier.getAgentType())
+                    .append("\n for node: ").append(node.toString()).append("\n\t\tNode will not be counted.");
             logger.log(Level.SEVERE, bud.toString());
         }    
         return nodeL;
     }
 
+    public Tier getTier() {
+        return tier;
+    }
+
+    public void setTier(Tier tier) {
+        this.tier = tier;
+    }
+
+    
     public String getName() {
         return name;
     }
@@ -95,21 +101,6 @@ public class TierLicenseCount extends LicenseCount{
         this.nodeLicenseCount = nodeLicenseCount;
     }
 
-    public String getTierAgentType() {
-        return tierAgentType;
-    }
-
-    public void setTierAgentType(String tierAgentType) {
-        this.tierAgentType = tierAgentType;
-    }
-
-    public int getTierId() {
-        return tierId;
-    }
-
-    public void setTierId(int tierId) {
-        this.tierId = tierId;
-    }
     
     
     
@@ -125,6 +116,9 @@ public class TierLicenseCount extends LicenseCount{
         if(s.debugLevel >= 2) 
             logger.log(Level.INFO,new StringBuilder().append("Populating tier ").append(name).append(" license count for application ").append(applicationName).toString());
         
+        MetricDatas tierAppAgents=access.getRESTMetricQuery(0, applicationName, name, totalTimeRange.getStart(), totalTimeRange.getEnd());
+        MetricDatas tierMachineAgents=access.getRESTMetricQuery(1, applicationName, name, totalTimeRange.getStart(), totalTimeRange.getEnd());
+        
         //totalRangeValue=new TierLicenseRange("Tier Total Count");
         //totalRangeValue.setStart(totalTimeRange.getStart());totalRangeValue.setEnd(totalTimeRange.getEnd());
         
@@ -132,7 +126,9 @@ public class TierLicenseCount extends LicenseCount{
          * This is going to get the nodes to count all of the licenses.
          * 
          * This is a good point to thread out
-         */
+        
+        Instead of asking on a per node, lets grab the tier level information.
+         
         ThreadExecutor execNodes = new ThreadExecutor(8);
         
         for(NodeLicenseCount nodeL:nodeLicenseCount){
@@ -145,30 +141,28 @@ public class TierLicenseCount extends LicenseCount{
         }
         execNodes.getExecutor().shutdown();
         execNodes.shutdown();
+        */
+
         
-        MetricDatas tierAppAgents=access.getRESTMetricQuery(0, applicationName, name, totalTimeRange.getStart(), totalTimeRange.getEnd());
-        MetricDatas tierMachineAgents=access.getRESTMetricQuery(1, applicationName, name, totalTimeRange.getStart(), totalTimeRange.getEnd());
         
-        //This call doesn't do anything --delete
-        getMetricValues(tierAppAgents).getMetricValue();
-        
-        // This is serial
-        ArrayList<TimeRange> hourlyTimeRanges=TimeRangeHelper.getHourlyTimeRanges(totalTimeRange.getStart(), totalTimeRange.getEnd());
-        for(TimeRange hourRange: hourlyTimeRanges){
-            TierHourLicenseRange tr=new TierHourLicenseRange(hourRange);
-            tr.createName();
-            
-            for(MetricValue mv:getMetricValues(tierAppAgents).getMetricValue()){
-                if(tr.withIn(mv.getStartTimeInMillis())) tr.getAppMetricValues().getMetricValue().add(mv);
+        // This is going to get the hourly values but we need to be type 0, otherwise it will not work
+        if(LicenseS.TYPE_V == 0){
+            ArrayList<TimeRange> hourlyTimeRanges=TimeRangeHelper.getHourlyTimeRanges(totalTimeRange.getStart(), totalTimeRange.getEnd());
+            for(TimeRange hourRange: hourlyTimeRanges){
+                TierHourLicenseRange tr=new TierHourLicenseRange(hourRange);
+                tr.createName();
+
+                for(MetricValue mv:getMetricValues(tierAppAgents).getMetricValue()){
+                    if(tr.withIn(mv.getStartTimeInMillis())) tr.getAppMetricValues().getMetricValue().add(mv);
+                }
+
+                for(MetricValue mv:getMetricValues(tierMachineAgents).getMetricValue()){
+                    if(tr.withIn(mv.getStartTimeInMillis())) tr.getMachineMetricValues().getMetricValue().add(mv);
+                }
+                tr.countAgents();
+                tierHourLicenseRange.add(tr);
             }
-            
-            for(MetricValue mv:getMetricValues(tierMachineAgents).getMetricValue()){
-                if(tr.withIn(mv.getStartTimeInMillis())) tr.getMachineMetricValues().getMetricValue().add(mv);
-            }
-            tr.countAgents();
-            tierHourLicenseRange.add(tr);
         }
-        
         
     }
     
@@ -179,88 +173,6 @@ public class TierLicenseCount extends LicenseCount{
     }
     
     
-    //0:Java, 1:IIS, 2:PHP, 3:NodeJS, 4 Machine Agent
-    public void countNodeLicenses(ArrayList<TimeRange> timeRanges,
-            HashMap<String,ArrayList<Node>> dotNetMap, ArrayList<String> dotNetKeys){
-        
-   
-        logger.log(Level.INFO,new StringBuilder().append("Starting tier level license count for tier ").append(name).toString());
-        
-        for(NodeLicenseCount nodeL:nodeLicenseCount){
-            nodeL.countNodeLicenseRange(s.percentageThreshold);  
-        } 
-        
-        for(int i=0; i < timeRanges.size(); i++){
-            TierLicenseRange tRange = new TierLicenseRange();
-            tRange.setStart(timeRanges.get(i).getStart());
-            tRange.setEnd(timeRanges.get(i).getEnd());
-            tRange.setName(tRange.createName());
-            HashMap<String,ArrayList<Node>> dotNetMapTemp=new HashMap<String,ArrayList<Node>>(dotNetMap);
-            ArrayList<String> foundDotNet=new ArrayList<String>();
-            for(NodeLicenseCount node:nodeLicenseCount){
-                if(node.getRangeValues().size() > i && node.getRangeValues().get(i).isCountAsLicense()){
-                    if(s.debugLevel >= 2)   logger.log(Level.INFO,new StringBuilder().append("\t\tCounting node type ").append(node.getType()).toString());
-                    switch(node.getType()){
-                        case 1:
-                            //We don't do anything for now, this is will be added up later.
-                            //logger.log(Level.INFO,"Adding DotNet " + node.getLicWeight());
-                            
-                            StringBuilder bud = new StringBuilder();
-                            bud.append("\n\tAdding .Net node ").append(node.getNode().getName()).append("\n\tiisCount orig value ").append(tRange.iisCount);
-                            if(dotNetMapTemp.containsKey(node.getMachineName()) 
-                                    && !foundDotNet.contains(node.getMachineName())
-                                    && ! dotNetKeys.contains(getNodeKey(tRange,node.getMachineName()))){
-                                tRange.iisCount++;
-                                tRange.totalCount++;
-                                foundDotNet.add(node.getMachineName());//dotNetMapTemp.remove(node.getMachineName());
-                                dotNetKeys.add(getNodeKey(tRange,node.getMachineName()));
-                                bud.append("\n----------------------------------------\n start:").append(tRange.getStart()).append(" -- ").append(tRange.getEnd());
-                                bud.append(" :: ").append(node.getNode().getTierName());
-                            }
-                            bud.append(" and iisInternalCount orig value ").append(tRange.iisInternalCount);
-                            tRange.iisInternalCount++;
-                            bud.append("\n\tiisCount new value ").append(tRange.iisCount).append(" and iisInternalCount new value ").append(tRange.iisInternalCount);
-
-                            
-                            break;
-                        case 2:
-                            //We don't do anything for now, this will be added up later
-                            //logger.log(Level.INFO,"Adding PHP " + node.getLicWeight());
-                            tRange.phpCount++;//=node.getLicWeight();
-                            tRange.totalCount++;//=node.getLicWeight();
-                            break;
-
-                        case 3:
-                            tRange.nodeJSCount++;
-                            tRange.totalCount++;
-                            break;
-                        case 4:
-                            tRange.machineCount++;
-                            tRange.totalCount++;
-                            break;
-                        case 6:
-                            tRange.webserverCount++;
-                            tRange.totalCount++;
-                            break;
-                        case 7:
-                            tRange.nativeSDKCount++;
-                            tRange.totalCount++;
-                            break;
-                        default:
-                            tRange.javaCount++;
-                            tRange.totalCount++;
-                            break;
-                    }
-                    
-                }
-            }
-            tierLicenseRange.add(tRange);
-        }
-        
-
-    }
-   
-    
     public ArrayList<TierLicenseRange> getTierLicenseRange() {
         return tierLicenseRange;
     }
@@ -269,15 +181,7 @@ public class TierLicenseCount extends LicenseCount{
         this.tierLicenseRange = tierLicenseRange;
     }
 
-    /*
-    public TierLicenseRange getTotalRangeValue() {
-        return totalRangeValue;
-    }
 
-    public void setTotalRangeValue(TierLicenseRange totalRangeValue) {
-        this.totalRangeValue = totalRangeValue;
-    }
-*/
     public ArrayList<TierHourLicenseRange> getTierHourLicenseRange() {
         return tierHourLicenseRange;
     }

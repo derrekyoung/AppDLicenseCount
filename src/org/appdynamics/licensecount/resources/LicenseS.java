@@ -18,6 +18,8 @@ public class LicenseS extends OPTS{
     
     public static final int A_INDEX=8; // This is the agent index
     
+    public static final int MIN_REST_MAJ_VER=2;
+    public static final int MIN_REST_MIN_VER=5;
     
     
     
@@ -33,6 +35,7 @@ public class LicenseS extends OPTS{
     public static final String WINDOWS_MAPPING="Windows Mapping";
     public static final String BU_LICENSE_SUMMARY = "Business Unit License Summary";
     public static final String EUM_SUMMARY="EUM Summary";
+    
 
     
     public static final String CUSTOMER_NAME="Cutomer Name";
@@ -56,6 +59,7 @@ public class LicenseS extends OPTS{
     public static final String NATIVE_SDK_AGENT_COUNT="Native SDK Agent Count";
     public static final String MACHINE_AGENT_COUNT="Machine Agent Count";
     public static final String APPLICATION_AGENT_COUNT="Application Agent Count";
+    public static final String NODE_AGENT_TYPE="NODEJS_APP_AGENT";
     
     public static final String AGENT_TYPE_CHK_PHP="PHP";
     public static final String AGENT_TYPE_CHK_IIS="IIS";
@@ -66,6 +70,7 @@ public class LicenseS extends OPTS{
     public static final String AGENT_NAME_NODEJS="NodeJS Agent";
     public static final String AGENT_NAME_DOTNET="DotNet Agent";
     public static final String AGENT_NAME_MACHINE_AGENT="Machine Agent";
+    public static final String AGENT_NAME_DB_AGENT="DB Agent";
     public static final String NONE="None";
     public static final String PRESENT="Present";
     public static final String DESCRIPTION="Description";

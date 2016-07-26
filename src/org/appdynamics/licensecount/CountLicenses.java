@@ -148,7 +148,7 @@ public class CountLicenses {
          
         //We can start to to thread these
         logger.log(Level.INFO,new StringBuilder().append("Populating the applications for a total of ").append(customer.getApplications().size()).append(" of applications").toString());
-        customer.populateApplications(access, LicenseS.INTERVAL_V);
+        customer.populateApplications(access, LicenseS.INTERVAL_V,0);
         //This is were we start to count the licenses.
         customer.countTierLicenses();
         
@@ -171,9 +171,7 @@ public class CountLicenses {
         else{s.debugLevel=LicenseS.DEBUG_V;}
         
         // Check for valid interval
-        if(!licOptions.validInterval(LicenseS.INTERVAL_V)){
-            logger.log(Level.SEVERE,new StringBuilder().append("Interval provided is ")
-                    .append(LicenseS.INTERVAL_V).append(" valid intervals are between 1-35\n").toString());
+        if(!licOptions.validInterval()){
             licOptions.printHelp();
             System.exit(1);
         }

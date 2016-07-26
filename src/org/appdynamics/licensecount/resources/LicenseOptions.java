@@ -69,8 +69,8 @@ public class LicenseOptions {
         
         options.addOption(LicenseS.NOW_S, LicenseS.NOW_L, LicenseS.NOW_A, LicenseS.NOW_D);
         
-        options.addOption(LicenseS.EUM_S, LicenseS.EUM_L, LicenseS.EUM_A, LicenseS.EUM_D);
-        options.addOption(LicenseS.DB_S, LicenseS.DB_L, LicenseS.DB_A, LicenseS.DB_D);
+        // options.addOption(LicenseS.EUM_S, LicenseS.EUM_L, LicenseS.EUM_A, LicenseS.EUM_D);
+        // options.addOption(LicenseS.DB_S, LicenseS.DB_L, LicenseS.DB_A, LicenseS.DB_D);
         
         Option debug = OptionBuilder.withLongOpt(LicenseS.DEBUG_L).withArgName( LicenseS.DEBUG_S )
                                 .hasArg()
@@ -92,6 +92,14 @@ public class LicenseOptions {
                                 .withDescription( LicenseS.INTERVAL_D )
                                 .create( LicenseS.INTERVAL_S );
         options.addOption(interval);
+        
+        options.addOption(LicenseS.LINTERVAL_S, LicenseS.LINTERVAL_L, LicenseS.LINTERVAL_A, LicenseS.LINTERVAL_D);
+        
+        Option type = OptionBuilder.withLongOpt(LicenseS.TYPE_L).withArgName( LicenseS.TYPE_S )
+                                .hasArg()
+                                .withDescription( LicenseS.TYPE_D )
+                                .create( LicenseS.TYPE_S );
+        options.addOption(type);
         
         Option uptime = OptionBuilder.withLongOpt(LicenseS.UPTIME_L).withArgName( LicenseS.UPTIME_S )
                                 .hasArg()
@@ -152,6 +160,7 @@ public class LicenseOptions {
                 LicenseS.NOW_V=true;
             }
             
+            /*
             if(cmdLine.hasOption(LicenseS.EUM_L) || cmdLine.hasOption(LicenseS.EUM_S)){
                 LicenseS.EUM_V=true;
             }
@@ -159,12 +168,16 @@ public class LicenseOptions {
             if(cmdLine.hasOption(LicenseS.DB_L) || cmdLine.hasOption(LicenseS.DB_S)){
                 LicenseS.DB_V=true;
             }
-            
+            */
             
             if(cmdLine.hasOption(LicenseS.INTERVAL_L) || cmdLine.hasOption(LicenseS.INTERVAL_S)){
                 LicenseS.INTERVAL_V=getValidNumber(cmdLine.getOptionValue(LicenseS.INTERVAL_S));
-                
             }
+            
+            if(cmdLine.hasOption(LicenseS.LINTERVAL_L) || cmdLine.hasOption(LicenseS.LINTERVAL_S)){
+                LicenseS.LINTERVAL_V=true;
+            }
+            
             if(cmdLine.hasOption(LicenseS.DEBUG_L) || cmdLine.hasOption(LicenseS.DEBUG_S)){
                 LicenseS.DEBUG_V=getValidNumber(cmdLine.getOptionValue(LicenseS.DEBUG_S));
                 
@@ -230,7 +243,7 @@ public class LicenseOptions {
     public int getValidNumber(String stringInt){
         try{
             Integer val = new Integer(stringInt);
-            return val.intValue();
+            return val;
         }catch(Exception e){
             logger.log(Level.SEVERE, new StringBuilder().append("Exception occurred while parsing number from ")
                     .append(stringInt).append(" ").append(e.getMessage()).toString());
@@ -251,8 +264,16 @@ public class LicenseOptions {
         return -1.0;
     }
     
-    public boolean validInterval(int interval){
-        if(interval > 0 && interval < 36) return true;
+    public boolean validInterval(){
+        if( LicenseS.TYPE_V == 0 ) {
+                if(LicenseS.LINTERVAL_V && LicenseS.INTERVAL_V > 0 && LicenseS.INTERVAL_V <= 365) return true;
+                if(LicenseS.INTERVAL_V > 0 && LicenseS.INTERVAL_V < 36) return true;
+        }else{
+                if(LicenseS.INTERVAL_V > 0 && LicenseS.INTERVAL_V <= 365) return true;
+        }
+        logger.log(Level.SEVERE, new StringBuilder()
+                .append("The license interval provide is invalid, for a daily run it must be between 1 and 35 days. For a minute run, it must be between 0 and 360 minutes")
+                    .toString()); 
         return false;
     }
     

@@ -159,6 +159,7 @@ public class TierLicenseRange extends TimeRange{
         bud.append("\t\tWebServer agent count ").append(webserverCount).append("\n");
         bud.append("\t\tNative SDK agent count ").append(nativeSDKCount).append("\n");
         bud.append("\t\tMachine agent count ").append(machineCount).append("\n");
+        bud.append("\t\tEUM Page count ").append(eumCount).append("\n");
         bud.append("\t\tStart time ").append(getDate(start)).append(" :: ").append(start).append("\n");
         bud.append("\t\tEnd time ").append(getDate(end)).append(" :: ").append(end).append("\n");
         return bud.toString();
